@@ -10,27 +10,30 @@ A fullstack application for managing pizza restaurant orders with real-time upda
 
 ## Setup Instructions
 
-### Quick Start
+### Quick Start (Frontend Only - Recommended)
 
-1. **Setup Environment Files:**
+1. **Start the Frontend:**
    ```bash
-   make setup
-   ```
-   Or manually:
-   ```bash
-   cp server/env.development server/.env
-   cp client/env.development client/.env
+   cd client
+   npm install
+   npm run dev
    ```
 
-2. **Start Development Environment:**
+2. **Access the Application:**
+   - Frontend: http://localhost:3000
+
+### Full Application with Docker
+
+1. **Start all services:**
    ```bash
-   make dev
+   docker compose up -d
    ```
 
-3. **Access the Application:**
+2. **Access the Application:**
    - Frontend: http://localhost:3000
    - Backend API: http://localhost:3001
    - Database: localhost:5432
+   - Redis: localhost:6379
 
 ### Manual Setup
 
