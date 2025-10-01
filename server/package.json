@@ -11,7 +11,10 @@
     "test:watch": "jest --watch",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
-    "format": "prettier --write src/**/*.ts"
+    "format": "prettier --write src/**/*.ts",
+    "seed": "ts-node scripts/seed.ts",
+    "clear-db": "ts-node scripts/clear-db.ts",
+    "reset-db": "npm run clear-db && npm run seed"
   },
   "keywords": [
     "pizza",
