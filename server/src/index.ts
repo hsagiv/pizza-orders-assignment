@@ -12,6 +12,7 @@ import { requestLogger } from '@/middleware/logger.middleware';
 import { rateLimiter } from '@/middleware/rate-limit.middleware';
 import { ordersRouter } from '@/routes/orders.routes';
 import { healthRouter } from '@/routes/health.routes';
+import { SocketServer } from '@/websocket';
 
 // Initialize Express app
 const app = express();
@@ -99,6 +100,10 @@ async function startServer() {
       console.log(`📋 Orders API: http://${config.server.host}:${config.server.port}/api/orders`);
       console.log(`🔧 Environment: ${config.app.environment}`);
     });
+    
+    // Initialize WebSocket server
+    const socketServer = new SocketServer(server);
+    console.log('✅ WebSocket server initialized');
     
     // Graceful shutdown
     process.on('SIGTERM', () => {
