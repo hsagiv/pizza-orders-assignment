@@ -16,7 +16,7 @@ export class HealthController {
         status: 'healthy',
         timestamp: new Date().toISOString(),
         uptime: process.uptime(),
-        environment: config.environment,
+        environment: config.server.nodeEnv,
         version: '1.0.0',
       };
 
@@ -182,7 +182,7 @@ export class HealthController {
       
       // Get database statistics
       const entityCount = AppDataSource.entityMetadatas.length;
-      const repositoryCount = Object.keys(AppDataSource.repositories).length;
+      const repositoryCount = AppDataSource.entityMetadatas.length;
 
       return {
         healthy: true,

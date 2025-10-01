@@ -2,6 +2,7 @@
 // This file provides high-level database operations for SubItem entities
 
 import { Repository, FindOptionsWhere, FindManyOptions, In } from 'typeorm';
+import { AppDataSource } from '@/config/typeorm.config';
 import { SubItem } from '@/models/SubItem.entity';
 import { SubItemType } from '@/types/SubItem';
 import { getRepository } from '@/config/typeorm.config';
@@ -10,7 +11,7 @@ export class SubItemRepository {
   private subItemRepository: Repository<SubItem>;
 
   constructor() {
-    this.subItemRepository = getRepository(SubItem);
+    this.subItemRepository = AppDataSource.getRepository(SubItem);
   }
 
   /**
@@ -111,7 +112,7 @@ export class SubItemRepository {
    */
   async delete(id: string): Promise<boolean> {
     const result = await this.subItemRepository.delete(id);
-    return result.affected !== undefined && result.affected > 0;
+    return result.affected !== undefined && result.affected !== null && result.affected > 0;
   }
 
   /**

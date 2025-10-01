@@ -51,14 +51,7 @@ export const typeOrmConfig: DataSourceOptions = {
   maxQueryExecutionTime: 1000, // Log slow queries (1 second)
   
   // Naming strategy
-  namingStrategy: {
-    tableName: (className: string, customName?: string) => {
-      return customName || className.toLowerCase();
-    },
-    columnName: (propertyName: string, customName?: string, embeddedPrefixes: string[] = []) => {
-      return customName || propertyName;
-    },
-  },
+  // Use default naming strategy
 };
 
 // Create DataSource instance
@@ -73,7 +66,7 @@ export async function initializeTypeORM(): Promise<DataSource> {
       
       // Log entity information
       console.log(`📊 Loaded entities: ${AppDataSource.entityMetadatas.length}`);
-      console.log(`🗃️  Available repositories: ${Object.keys(AppDataSource.repositories).length}`);
+      console.log(`🗃️  DataSource initialized successfully`);
       
       return AppDataSource;
     } else {
@@ -125,7 +118,7 @@ export async function checkTypeORMHealth(): Promise<{
   try {
     const isInitialized = AppDataSource.isInitialized;
     const entityCount = AppDataSource.entityMetadatas.length;
-    const repositoryCount = Object.keys(AppDataSource.repositories).length;
+    const repositoryCount = AppDataSource.entityMetadatas.length;
     
     return {
       status: isInitialized ? 'healthy' : 'unhealthy',

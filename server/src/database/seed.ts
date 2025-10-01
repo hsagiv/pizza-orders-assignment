@@ -31,7 +31,13 @@ const APPETIZER_TYPES = [
   'Nachos', 'Onion Rings', 'Buffalo Wings'
 ];
 
-const ORDER_STATUSES: OrderStatus[] = ['Received', 'Preparing', 'Ready', 'En-Route', 'Delivered'];
+const ORDER_STATUSES: OrderStatus[] = [
+  OrderStatus.RECEIVED, 
+  OrderStatus.PREPARING, 
+  OrderStatus.READY, 
+  OrderStatus.EN_ROUTE, 
+  OrderStatus.DELIVERED
+];
 
 // NYC area coordinates for realistic delivery locations
 const NYC_LOCATIONS = [
@@ -61,7 +67,13 @@ export class DatabaseSeeder {
    * Generate random subitem data
    */
   private generateSubItem(): { title: string; amount: number; type: SubItemType } {
-    const types: SubItemType[] = ['pizza', 'drink', 'salad', 'dessert', 'appetizer'];
+    const types: SubItemType[] = [
+      SubItemType.PIZZA, 
+      SubItemType.DRINK, 
+      SubItemType.SALAD, 
+      SubItemType.DESSERT, 
+      SubItemType.APPETIZER
+    ];
     const type = types[Math.floor(Math.random() * types.length)];
     
     let title: string;
@@ -73,7 +85,7 @@ export class DatabaseSeeder {
         amount = Math.floor(Math.random() * 3) + 1; // 1-3 pizzas
         break;
       case 'drink':
-        title = DRINK_TYPES[Math.floor(Math.random() * DRINK_TYPES.length)];
+        title = DRINK_TYPES[Math.floor(Math.random() * DRINK_TYPES.length)] || 'Coca Cola';
         amount = Math.floor(Math.random() * 4) + 1; // 1-4 drinks
         break;
       case 'salad':
@@ -81,11 +93,11 @@ export class DatabaseSeeder {
         amount = Math.floor(Math.random() * 2) + 1; // 1-2 salads
         break;
       case 'dessert':
-        title = DESSERT_TYPES[Math.floor(Math.random() * DESSERT_TYPES.length)];
+        title = DESSERT_TYPES[Math.floor(Math.random() * DESSERT_TYPES.length)] || 'Chocolate Cake';
         amount = Math.floor(Math.random() * 2) + 1; // 1-2 desserts
         break;
       case 'appetizer':
-        title = APPETIZER_TYPES[Math.floor(Math.random() * APPETIZER_TYPES.length)];
+        title = APPETIZER_TYPES[Math.floor(Math.random() * APPETIZER_TYPES.length)] || 'Garlic Bread';
         amount = Math.floor(Math.random() * 3) + 1; // 1-3 appetizers
         break;
       default:
@@ -93,7 +105,7 @@ export class DatabaseSeeder {
         amount = 1;
     }
     
-    return { title, amount, type };
+    return { title, amount, type: type as SubItemType };
   }
 
   /**
@@ -108,7 +120,7 @@ export class DatabaseSeeder {
     subItems: Array<{ title: string; amount: number; type: SubItemType }>;
   } {
     const location = NYC_LOCATIONS[Math.floor(Math.random() * NYC_LOCATIONS.length)];
-    const title = ORDER_TITLES[Math.floor(Math.random() * ORDER_TITLES.length)];
+    const title = ORDER_TITLES[Math.floor(Math.random() * ORDER_TITLES.length)] || 'Pizza Order';
     const status = ORDER_STATUSES[Math.floor(Math.random() * ORDER_STATUSES.length)];
     
     // Generate random time within the last 7 days
@@ -117,18 +129,18 @@ export class DatabaseSeeder {
     const orderTime = new Date(sevenDaysAgo.getTime() + Math.random() * (now.getTime() - sevenDaysAgo.getTime()));
     
     // Add some random variation to coordinates
-    const latitude = location.lat + (Math.random() - 0.5) * 0.01;
-    const longitude = location.lng + (Math.random() - 0.5) * 0.01;
+    const latitude = (location?.lat || 40.7128) + (Math.random() - 0.5) * 0.01;
+    const longitude = (location?.lng || -74.0060) + (Math.random() - 0.5) * 0.01;
     
     // Generate 1-5 subitems per order
     const subItemCount = Math.floor(Math.random() * 5) + 1;
     const subItems = Array.from({ length: subItemCount }, () => this.generateSubItem());
     
     return {
-      title,
+      title: title || 'Pizza Order',
       latitude,
       longitude,
-      status,
+      status: status || OrderStatus.RECEIVED,
       orderTime,
       subItems,
     };
@@ -196,11 +208,13 @@ export class DatabaseSeeder {
       let subItemIndex = 0;
       for (let i = 0; i < savedOrders.length; i++) {
         const order = savedOrders[i];
-        const orderSubItemCount = orders[i].subItems?.length || 0;
+        const orderSubItemCount = orders[i]?.subItems?.length || 0;
         
         for (let j = 0; j < orderSubItemCount; j++) {
-          allSubItems[subItemIndex].orderId = order.id;
-          subItemIndex++;
+          if (allSubItems[subItemIndex] && order) {
+            allSubItems[subItemIndex]!.orderId = order.id;
+            subItemIndex++;
+          }
         }
       }
       
@@ -210,10 +224,10 @@ export class DatabaseSeeder {
       // Update orders with their subitems
       for (let i = 0; i < savedOrders.length; i++) {
         const order = savedOrders[i];
-        const startIndex = allSubItems.findIndex(item => item.orderId === order.id);
-        const orderSubItemCount = orders[i].subItems?.length || 0;
+        const startIndex = allSubItems.findIndex(item => item.orderId === order?.id);
+        const orderSubItemCount = orders[i]?.subItems?.length || 0;
         
-        if (startIndex !== -1) {
+        if (startIndex !== -1 && order) {
           order.subItems = allSubItems.slice(startIndex, startIndex + orderSubItemCount);
         }
       }

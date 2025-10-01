@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-interface SettingsState {
+export interface SettingsState {
   ordersPerPage: number;
   sortBy: 'orderTime' | 'status' | 'title';
   sortOrder: 'asc' | 'desc';

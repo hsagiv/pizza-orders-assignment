@@ -20,7 +20,7 @@ export class SocketServer {
     // Initialize Socket.io server
     this.io = new SocketIOServer(httpServer, {
       cors: {
-        origin: getWebSocketConfig().connection.origin || "*",
+        origin: "*",
         methods: ["GET", "POST"],
         credentials: true,
       },

@@ -111,7 +111,7 @@ export class Order {
     order.title = data.title;
     order.latitude = data.latitude;
     order.longitude = data.longitude;
-    order.status = data.status || 'Received';
+    order.status = data.status || OrderStatus.RECEIVED;
     order.orderTime = new Date();
     
     if (data.subItems) {

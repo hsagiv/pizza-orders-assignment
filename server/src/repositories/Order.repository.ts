@@ -2,6 +2,7 @@
 // This file provides high-level database operations for Order entities
 
 import { Repository, FindOptionsWhere, FindManyOptions, In } from 'typeorm';
+import { AppDataSource } from '@/config/typeorm.config';
 import { Order } from '@/models/Order.entity';
 import { SubItem } from '@/models/SubItem.entity';
 import { OrderStatus } from '@/types/Order';
@@ -12,8 +13,8 @@ export class OrderRepository {
   private subItemRepository: Repository<SubItem>;
 
   constructor() {
-    this.orderRepository = getRepository(Order);
-    this.subItemRepository = getRepository(SubItem);
+    this.orderRepository = AppDataSource.getRepository(Order);
+    this.subItemRepository = AppDataSource.getRepository(SubItem);
   }
 
   /**
@@ -62,7 +63,7 @@ export class OrderRepository {
     }
 
     const orders = await this.orderRepository.find(findOptions);
-    return orders.length > 0 ? orders[0] : null;
+    return orders.length > 0 ? orders[0]! : null;
   }
 
   /**
@@ -84,7 +85,7 @@ export class OrderRepository {
       title: orderData.title,
       latitude: orderData.latitude,
       longitude: orderData.longitude,
-      status: orderData.status || 'Received',
+      status: orderData.status || OrderStatus.RECEIVED,
     });
 
     // Save order first
@@ -148,7 +149,7 @@ export class OrderRepository {
    */
   async delete(id: string): Promise<boolean> {
     const result = await this.orderRepository.delete(id);
-    return result.affected !== undefined && result.affected > 0;
+    return result.affected !== undefined && result.affected !== null && result.affected > 0;
   }
 
   /**

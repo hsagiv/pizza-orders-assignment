@@ -23,7 +23,7 @@ export interface SubItem {
   updatedAt: string;
 }
 
-interface OrdersState {
+export interface OrdersState {
   orders: Order[];
   loading: boolean;
   error: string | null;

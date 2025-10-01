@@ -98,7 +98,7 @@ async function startServer() {
       console.log(`🌐 Server running on http://${config.server.host}:${config.server.port}`);
       console.log(`📊 Health check: http://${config.server.host}:${config.server.port}/health`);
       console.log(`📋 Orders API: http://${config.server.host}:${config.server.port}/api/orders`);
-      console.log(`🔧 Environment: ${config.app.environment}`);
+      console.log(`🔧 Environment: ${config.server.nodeEnv}`);
     });
     
     // Initialize WebSocket server

@@ -249,10 +249,10 @@ export interface AppConfig {
 
 // Default configuration values
 const defaultConfig: AppConfig = {
-  environment: config.environment,
-  isDevelopment: config.isDevelopment,
-  isProduction: config.isProduction,
-  isTesting: config.environment === 'test',
+  environment: config.server.nodeEnv,
+  isDevelopment: config.server.nodeEnv === 'development',
+  isProduction: config.server.nodeEnv === 'production',
+  isTesting: config.server.nodeEnv === 'test',
   
   server: {
     port: config.server.port,

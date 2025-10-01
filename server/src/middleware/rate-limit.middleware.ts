@@ -66,7 +66,7 @@ function getClientIdentifier(req: Request): string {
 }
 
 // Rate limiter instance
-const rateLimiter = new RateLimiter(
+const rateLimiterInstance = new RateLimiter(
   getApiConfig().rateLimit.windowMs,
   getApiConfig().rateLimit.maxRequests,
   getApiConfig().rateLimit.skipSuccessfulRequests
@@ -74,16 +74,16 @@ const rateLimiter = new RateLimiter(
 
 // Cleanup expired records every 5 minutes
 setInterval(() => {
-  rateLimiter.cleanup();
+  rateLimiterInstance.cleanup();
 }, 5 * 60 * 1000);
 
 // Rate limiting middleware
 export function rateLimiter(req: Request, res: Response, next: NextFunction): void {
   const identifier = getClientIdentifier(req);
   
-  if (!rateLimiter.isAllowed(identifier)) {
-    const remainingRequests = rateLimiter.getRemainingRequests(identifier);
-    const resetTime = rateLimiter.getResetTime(identifier);
+  if (!rateLimiterInstance.isAllowed(identifier)) {
+    const remainingRequests = rateLimiterInstance.getRemainingRequests(identifier);
+    const resetTime = rateLimiterInstance.getResetTime(identifier);
     const retryAfter = Math.ceil((resetTime - Date.now()) / 1000);
     
     res.set({
@@ -104,8 +104,8 @@ export function rateLimiter(req: Request, res: Response, next: NextFunction): vo
   }
   
   // Add rate limit headers to response
-  const remainingRequests = rateLimiter.getRemainingRequests(identifier);
-  const resetTime = rateLimiter.getResetTime(identifier);
+  const remainingRequests = rateLimiterInstance.getRemainingRequests(identifier);
+  const resetTime = rateLimiterInstance.getResetTime(identifier);
   
   res.set({
     'X-RateLimit-Limit': getApiConfig().rateLimit.maxRequests.toString(),

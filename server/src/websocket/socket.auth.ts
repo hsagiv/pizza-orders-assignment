@@ -126,7 +126,7 @@ export class SocketAuth {
     for (const cookie of cookies) {
       const [key, value] = cookie.trim().split('=');
       if (key === name) {
-        return value;
+        return value || null;
       }
     }
     return null;

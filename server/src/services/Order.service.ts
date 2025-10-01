@@ -8,10 +8,10 @@ import { OrderStatus, CreateOrderRequest, UpdateOrderRequest } from '@/types/Ord
 import { SubItemType, CreateSubItemRequest } from '@/types/SubItem';
 
 export class OrderService {
-  private orderRepository: OrderRepository;
-  private subItemRepository: SubItemRepository;
+  private static orderRepository: OrderRepository;
+  private static subItemRepository: SubItemRepository;
 
-  constructor() {
+  static {
     this.orderRepository = new OrderRepository();
     this.subItemRepository = new SubItemRepository();
   }
@@ -19,7 +19,7 @@ export class OrderService {
   /**
    * Get all orders with optional filtering
    */
-  async getOrders(options: {
+  static async getOrders(options: {
     status?: OrderStatus;
     limit?: number;
     offset?: number;
@@ -31,20 +31,20 @@ export class OrderService {
   /**
    * Get order by ID with subitems
    */
-  async getOrderById(id: string, includeSubItems: boolean = true): Promise<Order | null> {
+  static async getOrderById(id: string, includeSubItems: boolean = true): Promise<Order | null> {
     return await this.orderRepository.findById(id, includeSubItems);
   }
 
   /**
    * Create a new order with subitems
    */
-  async createOrder(orderData: CreateOrderRequest): Promise<Order> {
+  static async createOrder(orderData: CreateOrderRequest): Promise<Order> {
     // Create order
     const order = await this.orderRepository.create({
       title: orderData.title,
       latitude: orderData.latitude,
       longitude: orderData.longitude,
-      status: 'Received',
+      status: OrderStatus.RECEIVED,
       subItems: orderData.subItems,
     });
 
@@ -54,35 +54,35 @@ export class OrderService {
   /**
    * Update order status
    */
-  async updateOrderStatus(id: string, status: OrderStatus): Promise<Order | null> {
+  static async updateOrderStatus(id: string, status: OrderStatus): Promise<Order | null> {
     return await this.orderRepository.updateStatus(id, status);
   }
 
   /**
    * Update order details
    */
-  async updateOrder(id: string, updateData: UpdateOrderRequest): Promise<Order | null> {
+  static async updateOrder(id: string, updateData: UpdateOrderRequest): Promise<Order | null> {
     return await this.orderRepository.update(id, updateData);
   }
 
   /**
    * Delete order and all its subitems
    */
-  async deleteOrder(id: string): Promise<boolean> {
+  static async deleteOrder(id: string): Promise<boolean> {
     return await this.orderRepository.delete(id);
   }
 
   /**
    * Get orders by status
    */
-  async getOrdersByStatus(status: OrderStatus, limit: number = 50, offset: number = 0): Promise<Order[]> {
+  static async getOrdersByStatus(status: OrderStatus, limit: number = 50, offset: number = 0): Promise<Order[]> {
     return await this.orderRepository.findByStatus(status, limit, offset);
   }
 
   /**
    * Get orders within a geographic area
    */
-  async getOrdersByLocation(
+  static async getOrdersByLocation(
     minLat: number,
     maxLat: number,
     minLng: number,
@@ -97,20 +97,20 @@ export class OrderService {
    * Get orders count by status
    */
   async getOrdersCountByStatus(): Promise<Array<{ status: string; count: number }>> {
-    return await this.orderRepository.getCountByStatus();
+    return await OrderService.orderRepository.getCountByStatus();
   }
 
   /**
    * Get active orders (not delivered)
    */
   async getActiveOrders(limit: number = 50, offset: number = 0): Promise<Order[]> {
-    return await this.orderRepository.findActive(limit, offset);
+    return await OrderService.orderRepository.findActive(limit, offset);
   }
 
   /**
    * Get order statistics
    */
-  async getOrderStatistics(): Promise<{
+  static async getOrderStatistics(): Promise<{
     totalOrders: number;
     activeOrders: number;
     deliveredOrders: number;
@@ -124,7 +124,7 @@ export class OrderService {
    */
   async addSubItemToOrder(orderId: string, subItemData: CreateSubItemRequest): Promise<SubItem | null> {
     // Check if order exists
-    const order = await this.getOrderById(orderId, false);
+    const order = await OrderService.getOrderById(orderId, false);
     if (!order) {
       return null;
     }
@@ -135,7 +135,7 @@ export class OrderService {
     }
 
     // Create subitem
-    return await this.subItemRepository.create({
+    return await OrderService.subItemRepository.create({
       title: subItemData.title,
       amount: subItemData.amount,
       type: subItemData.type,
@@ -151,28 +151,28 @@ export class OrderService {
     amount?: number;
     type?: SubItemType;
   }): Promise<SubItem | null> {
-    return await this.subItemRepository.update(subItemId, updateData);
+    return await OrderService.subItemRepository.update(subItemId, updateData);
   }
 
   /**
    * Delete subitem
    */
   async deleteSubItem(subItemId: string): Promise<boolean> {
-    return await this.subItemRepository.delete(subItemId);
+    return await OrderService.subItemRepository.delete(subItemId);
   }
 
   /**
    * Get subitems for an order
    */
   async getSubItemsForOrder(orderId: string): Promise<SubItem[]> {
-    return await this.subItemRepository.findByOrderId(orderId);
+    return await OrderService.subItemRepository.findByOrderId(orderId);
   }
 
   /**
    * Get subitems by type
    */
   async getSubItemsByType(type: SubItemType, limit: number = 100, offset: number = 0): Promise<SubItem[]> {
-    return await this.subItemRepository.findByType(type, limit, offset);
+    return await OrderService.subItemRepository.findByType(type, limit, offset);
   }
 
   /**
@@ -184,14 +184,14 @@ export class OrderService {
     averageAmount: number;
     typeDistribution: Array<{ type: string; count: number; percentage: number }>;
   }> {
-    return await this.subItemRepository.getStatistics();
+    return await OrderService.subItemRepository.getStatistics();
   }
 
   /**
    * Get most popular subitems
    */
   async getMostPopularSubItems(limit: number = 10): Promise<Array<{ title: string; totalAmount: number; orderCount: number }>> {
-    return await this.subItemRepository.getMostPopular(limit);
+    return await OrderService.subItemRepository.getMostPopular(limit);
   }
 
   /**
@@ -199,7 +199,7 @@ export class OrderService {
    */
   async updateOrderSubItems(orderId: string, subItems: CreateSubItemRequest[]): Promise<SubItem[]> {
     // Check if order exists and can be modified
-    const order = await this.getOrderById(orderId, false);
+    const order = await OrderService.getOrderById(orderId, false);
     if (!order) {
       throw new Error('Order not found');
     }
@@ -209,7 +209,7 @@ export class OrderService {
     }
 
     // Update subitems
-    return await this.subItemRepository.updateForOrder(orderId, subItems);
+    return await OrderService.subItemRepository.updateForOrder(orderId, subItems);
   }
 
   /**
@@ -221,7 +221,7 @@ export class OrderService {
     limit: number = 50,
     offset: number = 0
   ): Promise<Order[]> {
-    return await this.orderRepository.findByDateRange(startDate, endDate, limit, offset);
+    return await OrderService.orderRepository.findByDateRange(startDate, endDate, limit, offset);
   }
 
   /**
@@ -236,15 +236,15 @@ export class OrderService {
       itemTypes: string[];
     };
   } | null> {
-    const order = await this.getOrderById(id, true);
+    const order = await OrderService.getOrderById(id, true);
     if (!order) {
       return null;
     }
 
     const subItems = order.subItems || [];
-    const totalItems = subItems.reduce((sum, item) => sum + item.amount, 0);
-    const totalAmount = subItems.reduce((sum, item) => sum + item.totalPrice, 0);
-    const itemTypes = [...new Set(subItems.map(item => item.type))];
+    const totalItems = subItems.reduce((sum: number, item: any) => sum + item.amount, 0);
+    const totalAmount = subItems.reduce((sum: number, item: any) => sum + (item.totalPrice || 0), 0);
+    const itemTypes = [...new Set(subItems.map((item: any) => item.type))];
 
     return {
       order,

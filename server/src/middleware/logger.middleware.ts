@@ -13,7 +13,7 @@ interface LogEntry {
   responseTime: number;
   userAgent: string;
   ip: string;
-  contentLength?: number;
+  contentLength: number;
 }
 
 // Request logger middleware
@@ -34,7 +34,7 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
       responseTime,
       userAgent: req.get('User-Agent') || 'Unknown',
       ip: req.ip || req.connection.remoteAddress || 'Unknown',
-      contentLength: res.get('Content-Length') ? parseInt(res.get('Content-Length') || '0', 10) : undefined,
+      contentLength: res.get('Content-Length') ? parseInt(res.get('Content-Length') || '0', 10) : 0,
     };
     
     // Log based on environment
@@ -46,7 +46,7 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     }
     
     // Call original end method
-    originalEnd.call(this, chunk, encoding);
+    return originalEnd.call(this, chunk, encoding);
   };
   
   next();

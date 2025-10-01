@@ -18,7 +18,6 @@ const poolConfig: PoolConfig = {
   min: databaseConfig.pool.min,
   max: databaseConfig.pool.max,
   idleTimeoutMillis: databaseConfig.pool.idleTimeoutMillis,
-  acquireTimeoutMillis: databaseConfig.pool.acquireTimeoutMillis,
   // SSL configuration for production
   ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
   // Connection timeout
