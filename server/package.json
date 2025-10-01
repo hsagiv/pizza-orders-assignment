@@ -14,7 +14,13 @@
     "format": "prettier --write src/**/*.ts",
     "seed": "ts-node scripts/seed.ts",
     "clear-db": "ts-node scripts/clear-db.ts",
-    "reset-db": "npm run clear-db && npm run seed"
+    "reset-db": "npm run clear-db && npm run seed",
+    "docker:build": "docker build -t pizza-backend .",
+    "docker:build:dev": "docker build -f Dockerfile.dev -t pizza-backend-dev .",
+    "docker:build:prod": "docker build -f Dockerfile.prod -t pizza-backend-prod .",
+    "docker:run": "docker run -p 3001:3001 pizza-backend",
+    "docker:run:dev": "docker run -p 3001:3001 -p 9229:9229 -v $(pwd):/app pizza-backend-dev",
+    "setup-db": "ts-node scripts/setup-db.ts"
   },
   "keywords": [
     "pizza",

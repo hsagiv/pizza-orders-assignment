@@ -1,0 +1,51 @@
+# Pizza Order Management System - Backend Development Dockerfile
+# Optimized for development with hot reloading and debugging
+
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    curl \
+    git \
+    && rm -rf /var/cache/apk/*
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Copy package files
+COPY --chown=nodejs:nodejs package*.json ./
+COPY --chown=nodejs:nodejs tsconfig*.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci && npm cache clean --force
+
+# Copy source code
+COPY --chown=nodejs:nodejs . .
+
+# Create logs directory
+RUN mkdir -p /app/logs && chown -R nodejs:nodejs /app/logs
+
+# Switch to non-root user
+USER nodejs
+
+# Expose ports
+EXPOSE 3001 9229
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:3001/health || exit 1
+
+# Set environment variables
+ENV NODE_ENV=development
+ENV PORT=3001
+ENV HOST=0.0.0.0
+
+# Start the application with nodemon for hot reloading
+CMD ["npm", "run", "dev"]
