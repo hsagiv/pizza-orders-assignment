@@ -18,7 +18,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_prod_data:/var/lib/postgresql/data
-      - ./server/src/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./server/src/database/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./server/src/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
     networks:
       - pizza-prod-network

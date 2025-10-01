@@ -9,7 +9,7 @@ services:
     environment:
       POSTGRES_DB: pizza_orders_dev
     volumes:
-      - ./server/src/database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./server/src/database/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./server/src/database/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
 
   # Backend Service Override
