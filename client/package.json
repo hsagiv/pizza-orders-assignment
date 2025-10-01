@@ -12,7 +12,12 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "lint:fix": "eslint src --ext ts,tsx --fix",
-    "format": "prettier --write src/**/*.{ts,tsx,css,md}"
+    "format": "prettier --write src/**/*.{ts,tsx,css,md}",
+    "docker:build": "docker build -t pizza-frontend .",
+    "docker:build:dev": "docker build -f Dockerfile.dev -t pizza-frontend-dev .",
+    "docker:build:prod": "docker build -f Dockerfile.prod -t pizza-frontend-prod .",
+    "docker:run": "docker run -p 3000:3000 pizza-frontend",
+    "docker:run:dev": "docker run -p 3000:3000 -v $(pwd):/app pizza-frontend-dev"
   },
   "keywords": [
     "pizza",
