@@ -7,6 +7,10 @@
 help:
 	@echo "🍕 Pizza Order Management System - Docker Commands"
 	@echo ""
+	@echo "Setup Commands:"
+	@echo "  make setup        - Setup environment files"
+	@echo "  make setup-env    - Create .env files from templates"
+	@echo ""
 	@echo "Development Commands:"
 	@echo "  make dev          - Start development environment"
 	@echo "  make dev-build    - Build development images"
@@ -127,6 +131,24 @@ stop:
 restart:
 	@echo "🔄 Restarting services..."
 	docker-compose restart
+
+# Setup environment files
+setup: setup-env
+	@echo "🎉 Setup complete!"
+
+# Create .env files from templates
+setup-env:
+	@echo "📝 Setting up environment files..."
+	@if [ -f "setup-env.sh" ]; then \
+		chmod +x setup-env.sh && ./setup-env.sh; \
+	elif [ -f "setup-env.bat" ]; then \
+		setup-env.bat; \
+	else \
+		echo "⚠️  Setup scripts not found, creating .env files manually..."; \
+		cp server/env.development server/.env 2>/dev/null || echo "⚠️  Could not create server/.env"; \
+		cp client/env.development client/.env 2>/dev/null || echo "⚠️  Could not create client/.env"; \
+		echo "✅ Environment files created"; \
+	fi
 
 # Show help
 .DEFAULT_GOAL := help
