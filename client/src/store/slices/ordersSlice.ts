@@ -104,7 +104,8 @@ export const ordersSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload;
+        // Extract the data array from the API response
+        state.orders = action.payload.data || action.payload;
         state.lastUpdated = new Date().toISOString();
       })
       .addCase(fetchOrders.rejected, (state, action) => {

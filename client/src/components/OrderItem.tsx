@@ -76,7 +76,7 @@ export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) =
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <LocationIcon color="action" fontSize="small" />
               <Typography variant="body2" color="text.secondary">
-                {order.latitude.toFixed(4)}, {order.longitude.toFixed(4)}
+                {Number(order.latitude).toFixed(4)}, {Number(order.longitude).toFixed(4)}
               </Typography>
             </Box>
           </Grid>
@@ -95,10 +95,10 @@ export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) =
         <Box sx={{ mb: 2 }}>
           <Typography variant="subtitle2" sx={{ mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
             <RestaurantIcon fontSize="small" />
-            Items ({order.subItems.length})
+            Items ({order.subItems?.length || 0})
           </Typography>
           <Box sx={{ maxHeight: 120, overflow: 'auto' }}>
-            {order.subItems.map((item) => (
+            {order.subItems?.map((item) => (
               <Box key={item.id} sx={{ display: 'flex', justifyContent: 'space-between', py: 0.5 }}>
                 <Typography variant="body2">
                   {item.title} ({item.type})
@@ -107,7 +107,11 @@ export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) =
                   x{item.amount}
                 </Typography>
               </Box>
-            ))}
+            )) || (
+              <Typography variant="body2" color="text.secondary">
+                No items available
+              </Typography>
+            )}
           </Box>
         </Box>
 
