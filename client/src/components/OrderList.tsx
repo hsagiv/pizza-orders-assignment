@@ -31,6 +31,7 @@ import { fetchOrders, updateOrderStatus } from '../store/slices/ordersSlice';
 import { Order } from '../store/slices/ordersSlice';
 import { OrderItem } from './OrderItem';
 import { OrderMap } from './OrderMap';
+import { StatusBadge } from './StatusBadge';
 
 export const OrderList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -166,15 +167,9 @@ export const OrderList: React.FC = () => {
                     </Typography>
                   </TableCell>
                   <TableCell>
-                    <Chip
-                      label={order.status}
-                      color={
-                        order.status === 'Delivered' ? 'success' :
-                        order.status === 'En-Route' ? 'primary' :
-                        order.status === 'Ready' ? 'info' :
-                        order.status === 'Preparing' ? 'warning' : 'default'
-                      }
-                      size="small"
+                    <StatusBadge 
+                      status={order.status} 
+                      size="small" 
                     />
                   </TableCell>
                   <TableCell>

@@ -4,8 +4,6 @@ import {
   CardContent,
   Typography,
   Box,
-  Chip,
-  Button,
   Select,
   MenuItem,
   FormControl,
@@ -18,30 +16,17 @@ import {
   Restaurant as RestaurantIcon,
 } from '@mui/icons-material';
 import { Order } from '../store/slices/ordersSlice';
+import { StatusBadge } from './StatusBadge';
 
 interface OrderItemProps {
   order: Order;
   onStatusUpdate: (orderId: string, newStatus: string) => void;
 }
 
-const statusColors = {
-  Received: 'default',
-  Preparing: 'warning',
-  Ready: 'info',
-  'En-Route': 'primary',
-  Delivered: 'success',
-} as const;
-
-const statusLabels = {
-  Received: 'Received',
-  Preparing: 'Preparing',
-  Ready: 'Ready',
-  'En-Route': 'En Route',
-  Delivered: 'Delivered',
-} as const;
+// Status configuration removed - now using StatusBadge component
 
 export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) => {
-  const handleStatusChange = (event: any) => {
+  const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     onStatusUpdate(order.id, event.target.value);
   };
 
@@ -49,13 +34,21 @@ export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) =
     return new Date(dateString).toLocaleString();
   };
 
-  const getStatusColor = (status: string) => {
-    return statusColors[status as keyof typeof statusColors] || 'default';
+  // Helper function to safely format coordinates
+  const formatCoordinates = (lat: number | string, lng: number | string) => {
+    try {
+      const latitude = Number(lat);
+      const longitude = Number(lng);
+      if (isNaN(latitude) || isNaN(longitude)) {
+        return 'Invalid coordinates';
+      }
+      return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+    } catch (error) {
+      return 'Invalid coordinates';
+    }
   };
 
-  const getStatusLabel = (status: string) => {
-    return statusLabels[status as keyof typeof statusLabels] || status;
-  };
+// Status helper functions removed - now using StatusBadge component
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -64,10 +57,9 @@ export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) =
           <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
             {order.title}
           </Typography>
-          <Chip
-            label={getStatusLabel(order.status)}
-            color={getStatusColor(order.status)}
-            size="small"
+          <StatusBadge 
+            status={order.status} 
+            size="small" 
           />
         </Box>
 
@@ -76,7 +68,7 @@ export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) =
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
               <LocationIcon color="action" fontSize="small" />
               <Typography variant="body2" color="text.secondary">
-                {Number(order.latitude).toFixed(4)}, {Number(order.longitude).toFixed(4)}
+                {formatCoordinates(order.latitude, order.longitude)}
               </Typography>
             </Box>
           </Grid>
