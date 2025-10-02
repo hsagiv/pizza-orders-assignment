@@ -4,8 +4,8 @@ import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 export interface Order {
   id: string;
   title: string;
-  latitude: number;
-  longitude: number;
+  latitude: number | string;
+  longitude: number | string;
   orderTime: string;
   status: 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered';
   subItems: SubItem[];

@@ -5,19 +5,27 @@ import {
   Typography,
   CircularProgress,
   Alert,
-  Grid,
-  Card,
-  CardContent,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   Chip,
   Button,
   Select,
   MenuItem,
   FormControl,
   InputLabel,
-  Paper,
   Tabs,
   Tab,
 } from '@mui/material';
+import {
+  LocationOn as LocationIcon,
+  AccessTime as TimeIcon,
+  Restaurant as RestaurantIcon,
+} from '@mui/icons-material';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchOrders, updateOrderStatus } from '../store/slices/ordersSlice';
 import { Order } from '../store/slices/ordersSlice';
@@ -29,7 +37,7 @@ export const OrderList: React.FC = () => {
   const { orders, loading, error } = useSelector((state: RootState) => state.orders);
   const { ordersPerPage, sortBy, sortOrder } = useSelector((state: RootState) => state.settings);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
-  const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>();
+  const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -37,6 +45,20 @@ export const OrderList: React.FC = () => {
 
   const handleStatusUpdate = (orderId: string, newStatus: string) => {
     dispatch(updateOrderStatus({ orderId, status: newStatus }));
+  };
+
+  // Helper function to safely format coordinates
+  const formatCoordinates = (lat: number | string, lng: number | string) => {
+    try {
+      const latitude = Number(lat);
+      const longitude = Number(lng);
+      if (isNaN(latitude) || isNaN(longitude)) {
+        return 'Invalid coordinates';
+      }
+      return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+    } catch (error) {
+      return 'Invalid coordinates';
+    }
   };
 
   if (loading && orders.length === 0) {
@@ -119,21 +141,91 @@ export const OrderList: React.FC = () => {
 
       {/* Conditional rendering based on view mode */}
       {viewMode === 'list' ? (
-        <Grid container spacing={3}>
-          {orders.slice(0, ordersPerPage).map((order) => (
-            <Grid item xs={12} md={6} key={order.id}>
-              <OrderItem
-                order={order}
-                onStatusUpdate={handleStatusUpdate}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        <TableContainer component={Paper} sx={{ mt: 2 }}>
+          <Table sx={{ minWidth: 650 }} aria-label="orders table">
+            <TableHead>
+              <TableRow>
+                <TableCell><strong>Order ID</strong></TableCell>
+                <TableCell><strong>Title</strong></TableCell>
+                <TableCell><strong>Status</strong></TableCell>
+                <TableCell><strong>Location</strong></TableCell>
+                <TableCell><strong>Order Time</strong></TableCell>
+                <TableCell><strong>Sub-Items</strong></TableCell>
+                <TableCell><strong>Actions</strong></TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {orders.slice(0, ordersPerPage).map((order) => (
+                <TableRow key={order.id} hover>
+                  <TableCell component="th" scope="row">
+                    {order.id.substring(0, 8)}...
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2" fontWeight="medium">
+                      {order.title}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={order.status}
+                      color={
+                        order.status === 'Delivered' ? 'success' :
+                        order.status === 'En-Route' ? 'primary' :
+                        order.status === 'Ready' ? 'info' :
+                        order.status === 'Preparing' ? 'warning' : 'default'
+                      }
+                      size="small"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <LocationIcon fontSize="small" color="action" />
+                      <Typography variant="body2">
+                        {formatCoordinates(order.latitude, order.longitude)}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <TimeIcon fontSize="small" color="action" />
+                      <Typography variant="body2">
+                        {new Date(order.orderTime).toLocaleString()}
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                      <RestaurantIcon fontSize="small" color="action" />
+                      <Typography variant="body2">
+                        {order.subItems?.length || 0} items
+                      </Typography>
+                    </Box>
+                  </TableCell>
+                  <TableCell>
+                    <FormControl size="small" sx={{ minWidth: 120 }}>
+                      <Select
+                        value={order.status}
+                        onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
+                        displayEmpty
+                      >
+                        <MenuItem value="Received">Received</MenuItem>
+                        <MenuItem value="Preparing">Preparing</MenuItem>
+                        <MenuItem value="Ready">Ready</MenuItem>
+                        <MenuItem value="En-Route">En-Route</MenuItem>
+                        <MenuItem value="Delivered">Delivered</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
       ) : (
         <OrderMap
           orders={orders}
           onOrderSelect={handleOrderSelect}
-          selectedOrderId={selectedOrderId}
+          {...(selectedOrderId && { selectedOrderId })}
         />
       )}
 
