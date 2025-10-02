@@ -1,5 +1,5 @@
 # Pizza Order Management System - Frontend Production Dockerfile
-# Multi-stage build for optimized production image with Nginx
+# Optimized for production deployment with enhanced security and performance
 
 # Stage 1: Build stage
 FROM node:18-alpine AS builder
@@ -21,7 +21,7 @@ COPY tsconfig*.json ./
 COPY vite.config.ts ./
 
 # Install dependencies
-RUN npm ci && npm cache clean --force
+RUN npm ci --only=production && npm cache clean --force
 
 # Copy source code
 COPY src/ ./src/
@@ -45,11 +45,11 @@ RUN addgroup -g 1001 -S nginx && \
 COPY --from=builder /app/dist /usr/share/nginx/html
 
 # Copy custom nginx configuration
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.prod.conf /etc/nginx/nginx.conf
 
-# Create logs directory
-RUN mkdir -p /var/log/nginx && \
-    chown -R nginx:nginx /var/log/nginx /usr/share/nginx/html
+# Create necessary directories
+RUN mkdir -p /var/log/nginx /var/cache/nginx /var/run/nginx && \
+    chown -R nginx:nginx /var/log/nginx /var/cache/nginx /var/run/nginx /usr/share/nginx/html
 
 # Switch to non-root user
 USER nginx
@@ -64,6 +64,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
+ENV TZ=UTC
 
 # Start Nginx
 CMD ["nginx", "-g", "daemon off;"]

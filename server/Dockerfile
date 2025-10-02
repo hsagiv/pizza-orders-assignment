@@ -1,5 +1,5 @@
 # Pizza Order Management System - Backend Production Dockerfile
-# Multi-stage build for optimized production image
+# Optimized for production deployment with security and performance
 
 # Stage 1: Build stage
 FROM node:18-alpine AS builder
@@ -7,7 +7,7 @@ FROM node:18-alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies for building
 RUN apk add --no-cache \
     python3 \
     make \
@@ -19,14 +19,17 @@ RUN apk add --no-cache \
 COPY package*.json ./
 COPY tsconfig*.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install all dependencies (including dev dependencies for building)
+RUN npm ci && npm cache clean --force
 
 # Copy source code
 COPY src/ ./src/
 
 # Build the application
 RUN npm run build
+
+# Remove dev dependencies
+RUN npm prune --production
 
 # Stage 2: Production stage
 FROM node:18-alpine AS production
@@ -49,8 +52,9 @@ COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package*.json ./
 
-# Create logs directory
-RUN mkdir -p /app/logs && chown -R nodejs:nodejs /app/logs
+# Create necessary directories
+RUN mkdir -p /app/logs /app/tmp && \
+    chown -R nodejs:nodejs /app/logs /app/tmp
 
 # Switch to non-root user
 USER nodejs
@@ -66,6 +70,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 ENV NODE_ENV=production
 ENV PORT=3001
 ENV HOST=0.0.0.0
+ENV TZ=UTC
 
 # Use dumb-init to handle signals properly
 ENTRYPOINT ["dumb-init", "--"]
