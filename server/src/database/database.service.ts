@@ -7,8 +7,8 @@ import {
   getDatabaseClient,
   testConnection 
 } from './connection';
-import { Order, OrderStatus, CreateOrderRequest, UpdateOrderRequest } from '@/types/Order';
-import { SubItem, SubItemType, CreateSubItemRequest } from '@/types/SubItem';
+import { Order, OrderStatus, CreateOrderRequest, UpdateOrderRequest } from '../types/Order';
+import { SubItem, SubItemType, CreateSubItemRequest } from '../types/SubItem';
 
 export class DatabaseService {
   /**

@@ -10,5 +10,5 @@ export { OrderRepository } from '../repositories/Order.repository';
 export { SubItemRepository } from '../repositories/SubItem.repository';
 
 // Re-export types for convenience
-export type { OrderStatus } from '@/types/Order';
-export type { SubItemType } from '@/types/SubItem';
+export type { OrderStatus } from '../types/Order';
+export type { SubItemType } from '../types/SubItem';

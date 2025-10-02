@@ -2,7 +2,7 @@
 // This file provides rate limiting functionality
 
 import { Request, Response, NextFunction } from 'express';
-import { getApiConfig } from '@/config/app.config';
+import { getApiConfig } from '../config/app.config';
 
 // Simple in-memory rate limiter
 class RateLimiter {

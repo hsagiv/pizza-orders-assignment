@@ -3,8 +3,8 @@
 
 import { Server as SocketIOServer, Socket } from 'socket.io';
 import { SocketRooms } from './socket.rooms';
-import { OrderService } from '@/services/Order.service';
-import { OrderStatus } from '@/types/Order';
+import { OrderService } from '../services/Order.service';
+import { OrderStatus } from '../types/Order';
 
 export class SocketEvents {
   private io: SocketIOServer;

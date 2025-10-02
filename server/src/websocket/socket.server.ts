@@ -3,9 +3,9 @@
 
 import { Server as SocketIOServer } from 'socket.io';
 import { Server as HTTPServer } from 'http';
-import { getWebSocketConfig } from '@/config/app.config';
-import { OrderService } from '@/services/Order.service';
-import { OrderStatus } from '@/types/Order';
+import { getWebSocketConfig } from '../config/app.config';
+import { OrderService } from '../services/Order.service';
+import { OrderStatus } from '../types/Order';
 import { SocketAuth } from './socket.auth';
 import { SocketRooms } from './socket.rooms';
 import { SocketEvents } from './socket.events';

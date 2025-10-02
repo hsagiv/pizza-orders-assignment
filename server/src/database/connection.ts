@@ -2,7 +2,7 @@
 // This file handles connection pooling, health checks, and error handling
 
 import { Pool, PoolClient, PoolConfig } from 'pg';
-import { databaseConfig } from '@/config/environment';
+import { databaseConfig } from '../config/environment';
 
 // Database connection pool instance
 let pool: Pool | null = null;

@@ -3,8 +3,8 @@
 
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { config } from './environment';
-import { Order } from '@/models/Order.entity';
-import { SubItem } from '@/models/SubItem.entity';
+import { Order } from '../models/Order.entity';
+import { SubItem } from '../models/SubItem.entity';
 
 // TypeORM configuration options
 export const typeOrmConfig: DataSourceOptions = {
@@ -22,8 +22,8 @@ export const typeOrmConfig: DataSourceOptions = {
   migrations: ['src/database/migrations/*.ts'],
   migrationsTableName: 'typeorm_migrations',
   
-  // Synchronization (only for development)
-  synchronize: config.isDevelopment,
+  // Synchronization (disabled - using manual schema)
+  synchronize: false,
   logging: config.isDevelopment,
   
   // Connection pool settings
@@ -37,15 +37,15 @@ export const typeOrmConfig: DataSourceOptions = {
   // SSL configuration for production
   ssl: config.isProduction ? { rejectUnauthorized: false } : false,
   
-  // Cache configuration
-  cache: {
-    type: 'redis',
-    options: {
-      host: process.env.REDIS_HOST || 'localhost',
-      port: parseInt(process.env.REDIS_PORT || '6379', 10),
-    },
-    duration: 30000, // 30 seconds
-  },
+  // Cache configuration (disabled for now)
+  // cache: {
+  //   type: 'redis',
+  //   options: {
+  //     host: process.env.REDIS_HOST || 'localhost',
+  //     port: parseInt(process.env.REDIS_PORT || '6379', 10),
+  //   },
+  //   duration: 30000, // 30 seconds
+  // },
   
   // Query optimization
   maxQueryExecutionTime: 1000, // Log slow queries (1 second)

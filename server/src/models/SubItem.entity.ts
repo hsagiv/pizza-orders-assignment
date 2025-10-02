@@ -13,7 +13,7 @@ import {
 } from 'typeorm';
 import { IsString, IsNumber, IsEnum, IsOptional, Min, Length } from 'class-validator';
 import { Order } from './Order.entity';
-import { SubItemType } from '@/types/SubItem';
+import { SubItemType } from '../types/SubItem';
 
 @Entity('sub_items')
 @Index(['orderId']) // Index for fast order lookups

@@ -2,11 +2,11 @@
 // This file provides high-level database operations for Order entities
 
 import { Repository, FindOptionsWhere, FindManyOptions, In } from 'typeorm';
-import { AppDataSource } from '@/config/typeorm.config';
-import { Order } from '@/models/Order.entity';
-import { SubItem } from '@/models/SubItem.entity';
-import { OrderStatus } from '@/types/Order';
-import { getRepository } from '@/config/typeorm.config';
+import { AppDataSource } from '../config/typeorm.config';
+import { Order } from '../models/Order.entity';
+import { SubItem } from '../models/SubItem.entity';
+import { OrderStatus } from '../types/Order';
+import { getRepository } from '../config/typeorm.config';
 
 export class OrderRepository {
   private orderRepository: Repository<Order>;
@@ -62,8 +62,7 @@ export class OrderRepository {
       findOptions.relations = ['subItems'];
     }
 
-    const orders = await this.orderRepository.find(findOptions);
-    return orders.length > 0 ? orders[0]! : null;
+    return await this.orderRepository.findOne(findOptions);
   }
 
   /**

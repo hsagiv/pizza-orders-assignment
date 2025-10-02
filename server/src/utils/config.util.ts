@@ -1,7 +1,7 @@
 // Configuration utility functions
 // This file provides helper functions for working with application configuration
 
-import { appConfig, validateConfig } from '@/config/app.config';
+import { appConfig, validateConfig } from '../config/app.config';
 
 /**
  * Initialize and validate application configuration

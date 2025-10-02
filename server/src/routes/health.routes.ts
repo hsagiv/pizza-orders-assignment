@@ -2,8 +2,8 @@
 // This file provides health monitoring endpoints
 
 import { Router } from 'express';
-import { asyncHandler } from '@/middleware/error.middleware';
-import { HealthController } from '@/controllers/Health.controller';
+import { asyncHandler } from '../middleware/error.middleware';
+import { HealthController } from '../controllers/Health.controller';
 
 const router = Router();
 

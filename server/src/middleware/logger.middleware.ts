@@ -2,7 +2,7 @@
 // This file provides request logging functionality
 
 import { Request, Response, NextFunction } from 'express';
-import { config } from '@/config/environment';
+import { config } from '../config/environment';
 
 // Request logging interface
 interface LogEntry {

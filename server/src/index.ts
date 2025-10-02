@@ -4,15 +4,15 @@
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import { config } from '@/config/environment';
-import { initializeTypeORM } from '@/config/typeorm.config';
-import { initializeConfig } from '@/utils/config.util';
-import { errorHandler } from '@/middleware/error.middleware';
-import { requestLogger } from '@/middleware/logger.middleware';
-import { rateLimiter } from '@/middleware/rate-limit.middleware';
-import { ordersRouter } from '@/routes/orders.routes';
-import { healthRouter } from '@/routes/health.routes';
-import { SocketServer } from '@/websocket';
+import { config } from './config/environment';
+import { initializeTypeORM } from './config/typeorm.config';
+import { initializeConfig } from './utils/config.util';
+import { errorHandler } from './middleware/error.middleware';
+import { requestLogger } from './middleware/logger.middleware';
+import { rateLimiter } from './middleware/rate-limit.middleware';
+import { ordersRouter } from './routes/orders.routes';
+import { healthRouter } from './routes/health.routes';
+import { SocketServer } from './websocket';
 
 // Initialize Express app
 const app = express();
@@ -55,7 +55,7 @@ app.use(rateLimiter);
 app.use('/health', healthRouter);
 
 // API routes
-app.use('/api', ordersRouter);
+app.use('/api/orders', ordersRouter);
 
 // Root endpoint
 app.get('/', (req, res) => {

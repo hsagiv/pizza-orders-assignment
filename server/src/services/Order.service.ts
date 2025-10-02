@@ -1,11 +1,11 @@
 // Order Service - High-level business logic for order management
 // This file combines Order and SubItem repositories to provide business operations
 
-import { OrderRepository } from '@/repositories/Order.repository';
-import { SubItemRepository } from '@/repositories/SubItem.repository';
-import { Order, SubItem } from '@/models';
-import { OrderStatus, CreateOrderRequest, UpdateOrderRequest } from '@/types/Order';
-import { SubItemType, CreateSubItemRequest } from '@/types/SubItem';
+import { OrderRepository } from '../repositories/Order.repository';
+import { SubItemRepository } from '../repositories/SubItem.repository';
+import { Order, SubItem } from '../models';
+import { OrderStatus, CreateOrderRequest, UpdateOrderRequest } from '../types/Order';
+import { SubItemType, CreateSubItemRequest } from '../types/SubItem';
 
 export class OrderService {
   private static orderRepository: OrderRepository;

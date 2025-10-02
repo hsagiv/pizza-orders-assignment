@@ -2,10 +2,10 @@
 // This file handles all order-related API requests
 
 import { Request, Response } from 'express';
-import { OrderService } from '@/services/Order.service';
-import { AppError } from '@/middleware/error.middleware';
-import { OrderStatus } from '@/types/Order';
-import { getApiConfig } from '@/config/app.config';
+import { OrderService } from '../services/Order.service';
+import { AppError } from '../middleware/error.middleware';
+import { OrderStatus } from '../types/Order';
+import { getApiConfig } from '../config/app.config';
 
 export class OrderController {
   /**
@@ -36,16 +36,12 @@ export class OrderController {
         throw new AppError('Invalid order status', 400);
       }
 
-      // Get orders from service
-      const orders = await OrderService.getOrders({
-        status: status as OrderStatus,
-        limit: parsedLimit,
-        offset: parsedOffset,
-        includeSubItems: parsedIncludeSubItems,
-      });
+      // Get orders using raw SQL query to test database connection
+      const { AppDataSource } = await import('../config/typeorm.config');
+      const orders = await AppDataSource.query('SELECT * FROM orders LIMIT $1 OFFSET $2', [parsedLimit, parsedOffset]);
 
-      // Get total count for pagination
-      const totalCount = await OrderService.getOrderStatistics();
+      // Get total count for pagination (temporarily disabled)
+      const totalCount = { totalOrders: orders.length };
 
       // Prepare response
       const response = {

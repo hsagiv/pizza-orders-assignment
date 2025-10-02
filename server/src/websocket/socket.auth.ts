@@ -2,7 +2,7 @@
 // This file handles WebSocket connection authentication
 
 import { Socket } from 'socket.io';
-import { getSecurityConfig } from '@/config/app.config';
+import { getSecurityConfig } from '../config/app.config';
 
 interface AuthenticatedSocket extends Socket {
   user?: {

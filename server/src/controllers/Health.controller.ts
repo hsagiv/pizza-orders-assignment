@@ -2,9 +2,9 @@
 // This file handles health check endpoints
 
 import { Request, Response } from 'express';
-import { AppDataSource } from '@/config/typeorm.config';
-import { getConfigSummary } from '@/utils/config.util';
-import { config } from '@/config/environment';
+import { AppDataSource } from '../config/typeorm.config';
+import { getConfigSummary } from '../utils/config.util';
+import { config } from '../config/environment';
 
 export class HealthController {
   /**

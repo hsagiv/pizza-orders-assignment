@@ -1,9 +1,9 @@
 // WebSocket service integration
 // This file provides WebSocket integration with the order service
 
-import { SocketServer } from '@/websocket';
+import { SocketServer } from '../websocket';
 import { OrderService } from './Order.service';
-import { OrderStatus } from '@/types/Order';
+import { OrderStatus } from '../types/Order';
 
 export class WebSocketService {
   private socketServer: SocketServer | null = null;

@@ -2,10 +2,10 @@
 // This file provides high-level database operations for SubItem entities
 
 import { Repository, FindOptionsWhere, FindManyOptions, In } from 'typeorm';
-import { AppDataSource } from '@/config/typeorm.config';
-import { SubItem } from '@/models/SubItem.entity';
-import { SubItemType } from '@/types/SubItem';
-import { getRepository } from '@/config/typeorm.config';
+import { AppDataSource } from '../config/typeorm.config';
+import { SubItem } from '../models/SubItem.entity';
+import { SubItemType } from '../types/SubItem';
+import { getRepository } from '../config/typeorm.config';
 
 export class SubItemRepository {
   private subItemRepository: Repository<SubItem>;

@@ -2,7 +2,7 @@
 // This file handles room organization for WebSocket clients
 
 import { Server as SocketIOServer, Socket } from 'socket.io';
-import { OrderStatus } from '@/types/Order';
+import { OrderStatus } from '../types/Order';
 
 export class SocketRooms {
   private io: SocketIOServer;

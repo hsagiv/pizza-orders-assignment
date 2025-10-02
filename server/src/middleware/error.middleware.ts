@@ -2,7 +2,7 @@
 // This file provides centralized error handling for the Express application
 
 import { Request, Response, NextFunction } from 'express';
-import { config } from '@/config/environment';
+import { config } from '../config/environment';
 
 // Custom error class
 export class AppError extends Error {

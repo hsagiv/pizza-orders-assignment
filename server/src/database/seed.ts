@@ -1,11 +1,11 @@
 // Database seeding script using TypeORM
 // This file populates the database with 300 realistic sample orders
 
-import { AppDataSource } from '@/config/typeorm.config';
-import { Order } from '@/models/Order.entity';
-import { SubItem } from '@/models/SubItem.entity';
-import { OrderStatus } from '@/types/Order';
-import { SubItemType } from '@/types/SubItem';
+import { AppDataSource } from '../config/typeorm.config';
+import { Order } from '../models/Order.entity';
+import { SubItem } from '../models/SubItem.entity';
+import { OrderStatus } from '../types/Order';
+import { SubItemType } from '../types/SubItem';
 
 // Sample data for realistic pizza restaurant orders
 const PIZZA_TYPES = [

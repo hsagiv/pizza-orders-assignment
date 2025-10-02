@@ -30,5 +30,5 @@ export { DatabaseSetup, setupDatabase } from './setup';
 // export * from './seed';
 
 // Re-export types for convenience
-export type { Order, OrderStatus, CreateOrderRequest, UpdateOrderRequest } from '@/types/Order';
-export type { SubItem, SubItemType, CreateSubItemRequest } from '@/types/SubItem';
+export type { Order, OrderStatus, CreateOrderRequest, UpdateOrderRequest } from '../types/Order';
+export type { SubItem, SubItemType, CreateSubItemRequest } from '../types/SubItem';
