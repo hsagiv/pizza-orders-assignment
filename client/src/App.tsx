@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -6,21 +6,36 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { OrderList } from './components/OrderList';
 import { Header } from './components/Header';
+import { LanguageSelector } from './components/LanguageSelector';
 import { Container, Box } from '@mui/material';
 
-// Create Material-UI theme
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-});
+// RTL languages
+const rtlLanguages = ['he', 'ar'];
 
 function App() {
+  const [language, setLanguage] = useState('en');
+  const isRTL = rtlLanguages.includes(language);
+
+  // Create Material-UI theme with RTL support
+  const theme = useMemo(() => createTheme({
+    palette: {
+      primary: {
+        main: '#1976d2',
+      },
+      secondary: {
+        main: '#dc004e',
+      },
+    },
+    direction: isRTL ? 'rtl' : 'ltr',
+  }), [isRTL]);
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+    // Update document direction
+    document.dir = rtlLanguages.includes(newLanguage) ? 'rtl' : 'ltr';
+    document.documentElement.lang = newLanguage;
+  };
+
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
@@ -29,6 +44,14 @@ function App() {
           <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
             <Header />
             <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
+              {/* Language Selector */}
+              <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
+                <LanguageSelector 
+                  language={language} 
+                  onLanguageChange={handleLanguageChange} 
+                />
+              </Box>
+              
               <Routes>
                 <Route path="/" element={<OrderList />} />
                 <Route path="/orders" element={<OrderList />} />
