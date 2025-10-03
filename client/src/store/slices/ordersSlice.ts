@@ -43,7 +43,8 @@ export const fetchOrders = createAsyncThunk(
   'orders/fetchOrders',
   async (_, { rejectWithValue }) => {
     try {
-      const response = await fetch('/api/orders');
+      // Request all orders by setting a high limit
+      const response = await fetch('/api/orders?limit=1000');
       if (!response.ok) {
         throw new Error('Failed to fetch orders');
       }
