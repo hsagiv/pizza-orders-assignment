@@ -72,8 +72,16 @@ export const OrderList: React.FC = () => {
 
   // Filter and sort orders based on current settings - MUST be before any early returns
   const filteredAndSortedOrders = React.useMemo(() => {
+    // Debug: Log all orders and current filter
+    console.log('🔍 Debug - Total orders:', orders.length);
+    console.log('🔍 Debug - Current filter:', statusFilter);
+    console.log('🔍 Debug - All orders:', orders.map(o => ({ id: o.id, status: o.status, title: o.title })));
+    
     // First filter orders by status
-    const filtered = orders.filter(order => order.status === statusFilter);
+    const filtered = statusFilter === 'all' 
+      ? orders 
+      : orders.filter(order => order.status === statusFilter);
+    console.log('🔍 Debug - Filtered orders:', filtered.length);
     
     // Then sort the filtered orders
     const sorted = [...filtered].sort((a, b) => {
@@ -180,7 +188,7 @@ export const OrderList: React.FC = () => {
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Typography variant="h4" component="h1">
-            {statusFilter} Orders ({filteredAndSortedOrders.length})
+            {statusFilter === 'all' ? 'All Orders' : `${statusFilter} Orders`} ({filteredAndSortedOrders.length})
           </Typography>
               <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                 <Box
@@ -211,6 +219,7 @@ export const OrderList: React.FC = () => {
               label="Filter"
               onChange={(e) => dispatch({ type: 'settings/setStatusFilter', payload: e.target.value })}
             >
+              <MenuItem value="all">All Orders</MenuItem>
               <MenuItem value="Received">Received</MenuItem>
               <MenuItem value="Preparing">Preparing</MenuItem>
               <MenuItem value="Ready">Ready</MenuItem>

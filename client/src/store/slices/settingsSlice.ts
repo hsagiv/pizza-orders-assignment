@@ -11,7 +11,7 @@ export interface SettingsState {
   language: string;
   rtl: boolean;
   // Filter settings
-  statusFilter: 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered';
+  statusFilter: 'all' | 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered';
 }
 
 const initialState: SettingsState = {
@@ -24,7 +24,7 @@ const initialState: SettingsState = {
   theme: 'light',
   language: 'en',
   rtl: false,
-  statusFilter: 'Received', // Default to showing only "Received" orders
+  statusFilter: 'all', // Default to showing all orders
 };
 
 export const settingsSlice = createSlice({
@@ -62,7 +62,7 @@ export const settingsSlice = createSlice({
     setRtl: (state, action: PayloadAction<boolean>) => {
       state.rtl = action.payload;
     },
-    setStatusFilter: (state, action: PayloadAction<'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered'>) => {
+    setStatusFilter: (state, action: PayloadAction<'all' | 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered'>) => {
       state.statusFilter = action.payload;
     },
   },
