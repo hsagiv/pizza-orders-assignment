@@ -6,7 +6,7 @@ import { Provider } from 'react-redux';
 import { store } from './store/store';
 import { OrderList } from './components/OrderList';
 import { Header } from './components/Header';
-import { LanguageSelector } from './components/LanguageSelector';
+import { LanguageProvider } from './contexts/LanguageContext';
 import { Container, Box } from '@mui/material';
 
 // RTL languages
@@ -38,28 +38,22 @@ function App() {
 
   return (
     <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Header />
-            <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
-              {/* Language Selector */}
-              <Box sx={{ mb: 3, display: 'flex', justifyContent: 'flex-end' }}>
-                <LanguageSelector 
-                  language={language} 
-                  onLanguageChange={handleLanguageChange} 
-                />
-              </Box>
-              
-              <Routes>
-                <Route path="/" element={<OrderList />} />
-                <Route path="/orders" element={<OrderList />} />
-              </Routes>
-            </Container>
-          </Box>
-        </Router>
-      </ThemeProvider>
+      <LanguageProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <Router>
+            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+              <Header />
+              <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
+                <Routes>
+                  <Route path="/" element={<OrderList />} />
+                  <Route path="/orders" element={<OrderList />} />
+                </Routes>
+              </Container>
+            </Box>
+          </Router>
+        </ThemeProvider>
+      </LanguageProvider>
     </Provider>
   );
 }

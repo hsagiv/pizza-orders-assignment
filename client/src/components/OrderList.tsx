@@ -34,21 +34,50 @@ import { Order } from '../store/slices/ordersSlice';
 import { OrderItem } from './OrderItem';
 import { OrderMap } from './OrderMap';
 import { StatusBadge } from './StatusBadge';
+import { useWebSocket } from '../hooks/useWebSocket';
 
 export const OrderList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { orders, loading, error } = useSelector((state: RootState) => state.orders);
-  const { ordersPerPage, sortBy, sortOrder } = useSelector((state: RootState) => state.settings);
+  const { ordersPerPage, sortBy, sortOrder, statusFilter } = useSelector((state: RootState) => state.settings);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(undefined);
+
+  // WebSocket connection for real-time updates
+  const { isConnected, error: wsError, subscribeToOrderUpdates, unsubscribeFromOrderUpdates } = useWebSocket(
+    process.env.REACT_APP_WS_URL || 'http://localhost:3001'
+  );
 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
 
-  // Sort orders based on current settings - MUST be before any early returns
-  const sortedOrders = React.useMemo(() => {
-    const sorted = [...orders].sort((a, b) => {
+  // Subscribe to real-time order updates
+  useEffect(() => {
+    const handleOrderUpdate = (data: any) => {
+      console.log('📡 Received order update:', data);
+      // Refresh orders when real-time update is received
+      dispatch(fetchOrders());
+    };
+
+    if (isConnected) {
+      subscribeToOrderUpdates(handleOrderUpdate);
+    }
+
+    return () => {
+      unsubscribeFromOrderUpdates(handleOrderUpdate);
+    };
+  }, [isConnected, dispatch, subscribeToOrderUpdates, unsubscribeFromOrderUpdates]);
+
+  // Filter and sort orders based on current settings - MUST be before any early returns
+  const filteredAndSortedOrders = React.useMemo(() => {
+    // First filter orders by status
+    const filtered = statusFilter === 'all' 
+      ? orders 
+      : orders.filter(order => order.status === statusFilter);
+    
+    // Then sort the filtered orders
+    const sorted = [...filtered].sort((a, b) => {
       let comparison = 0;
       
       switch (sortBy) {
@@ -81,7 +110,7 @@ export const OrderList: React.FC = () => {
     });
     
     return sorted;
-  }, [orders, sortBy, sortOrder]);
+  }, [orders, sortBy, sortOrder, statusFilter]);
 
   const handleStatusUpdate = (orderId: string, newStatus: string) => {
     dispatch(updateOrderStatus({ orderId, status: newStatus }));
@@ -137,10 +166,40 @@ export const OrderList: React.FC = () => {
   return (
     <Box>
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4" component="h1">
-          Orders ({orders.length})
-        </Typography>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+          <Typography variant="h4" component="h1">
+            Orders ({orders.length})
+          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+            <Box
+              sx={{
+                width: 8,
+                height: 8,
+                borderRadius: '50%',
+                backgroundColor: isConnected ? 'success.main' : 'error.main',
+              }}
+            />
+            <Typography variant="caption" color="text.secondary">
+              {isConnected ? 'Live' : 'Offline'}
+            </Typography>
+          </Box>
+        </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Filter</InputLabel>
+            <Select
+              value={statusFilter}
+              label="Filter"
+              onChange={(e) => dispatch({ type: 'settings/setStatusFilter', payload: e.target.value })}
+            >
+              <MenuItem value="all">All Orders</MenuItem>
+              <MenuItem value="Received">Received</MenuItem>
+              <MenuItem value="Preparing">Preparing</MenuItem>
+              <MenuItem value="Ready">Ready</MenuItem>
+              <MenuItem value="En-Route">En Route</MenuItem>
+              <MenuItem value="Delivered">Delivered</MenuItem>
+            </Select>
+          </FormControl>
           <FormControl size="small" sx={{ minWidth: 120 }}>
             <InputLabel>Sort By</InputLabel>
             <Select
@@ -163,6 +222,19 @@ export const OrderList: React.FC = () => {
             >
               <MenuItem value="asc">Ascending</MenuItem>
               <MenuItem value="desc">Descending</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Per Page</InputLabel>
+            <Select
+              value={ordersPerPage}
+              label="Per Page"
+              onChange={(e) => dispatch({ type: 'settings/setOrdersPerPage', payload: Number(e.target.value) })}
+            >
+              <MenuItem value={1}>1 Order</MenuItem>
+              <MenuItem value={2}>2 Orders</MenuItem>
+              <MenuItem value={3}>3 Orders</MenuItem>
+              <MenuItem value={4}>4 Orders</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -224,7 +296,7 @@ export const OrderList: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {sortedOrders.slice(0, ordersPerPage).map((order) => (
+              {filteredAndSortedOrders.slice(0, ordersPerPage).map((order) => (
                 <TableRow key={order.id} hover>
                   <TableCell component="th" scope="row">
                     {order.id.substring(0, 8)}...
@@ -292,10 +364,10 @@ export const OrderList: React.FC = () => {
         />
       )}
 
-      {sortedOrders.length > ordersPerPage && (
+      {filteredAndSortedOrders.length > ordersPerPage && (
         <Box sx={{ mt: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            Showing {ordersPerPage} of {sortedOrders.length} orders
+            Showing {ordersPerPage} of {filteredAndSortedOrders.length} orders
           </Typography>
         </Box>
       )}

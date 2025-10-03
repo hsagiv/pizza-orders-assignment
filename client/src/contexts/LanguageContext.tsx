@@ -1,0 +1,145 @@
+import React, { createContext, useContext, ReactNode } from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../store/store';
+
+// Language translations
+const translations = {
+  en: {
+    orders: 'Orders',
+    orderManagement: 'Order Management',
+    received: 'Received',
+    preparing: 'Preparing',
+    ready: 'Ready',
+    enRoute: 'En Route',
+    delivered: 'Delivered',
+    allOrders: 'All Orders',
+    sortBy: 'Sort By',
+    orderTime: 'Order Time',
+    status: 'Status',
+    title: 'Title',
+    location: 'Location',
+    ascending: 'Ascending',
+    descending: 'Descending',
+    perPage: 'Per Page',
+    ordersPerPage: 'Orders',
+    filter: 'Filter',
+    listView: 'List View',
+    mapView: 'Map View',
+    live: 'Live',
+    offline: 'Offline',
+    showing: 'Showing',
+    of: 'of',
+    orders: 'orders',
+    noOrdersFound: 'No orders found',
+    ordersWillAppear: 'Orders will appear here when they are created.',
+    errorLoadingOrders: 'Error loading orders',
+    items: 'items',
+    actions: 'Actions',
+    subItems: 'Sub-Items',
+    orderId: 'Order ID',
+  },
+  he: {
+    orders: 'הזמנות',
+    orderManagement: 'ניהול הזמנות',
+    received: 'התקבל',
+    preparing: 'בהכנה',
+    ready: 'מוכן',
+    enRoute: 'בדרך',
+    delivered: 'נמסר',
+    allOrders: 'כל ההזמנות',
+    sortBy: 'מיון לפי',
+    orderTime: 'זמן הזמנה',
+    status: 'סטטוס',
+    title: 'כותרת',
+    location: 'מיקום',
+    ascending: 'עולה',
+    descending: 'יורד',
+    perPage: 'לעמוד',
+    ordersPerPage: 'הזמנות',
+    filter: 'סינון',
+    listView: 'תצוגת רשימה',
+    mapView: 'תצוגת מפה',
+    live: 'חי',
+    offline: 'לא מקוון',
+    showing: 'מציג',
+    of: 'מתוך',
+    orders: 'הזמנות',
+    noOrdersFound: 'לא נמצאו הזמנות',
+    ordersWillAppear: 'הזמנות יופיעו כאן כאשר הן נוצרות.',
+    errorLoadingOrders: 'שגיאה בטעינת הזמנות',
+    items: 'פריטים',
+    actions: 'פעולות',
+    subItems: 'תת-פריטים',
+    orderId: 'מזהה הזמנה',
+  },
+  ar: {
+    orders: 'الطلبات',
+    orderManagement: 'إدارة الطلبات',
+    received: 'تم الاستلام',
+    preparing: 'قيد التحضير',
+    ready: 'جاهز',
+    enRoute: 'في الطريق',
+    delivered: 'تم التسليم',
+    allOrders: 'جميع الطلبات',
+    sortBy: 'ترتيب حسب',
+    orderTime: 'وقت الطلب',
+    status: 'الحالة',
+    title: 'العنوان',
+    location: 'الموقع',
+    ascending: 'تصاعدي',
+    descending: 'تنازلي',
+    perPage: 'في الصفحة',
+    ordersPerPage: 'طلبات',
+    filter: 'تصفية',
+    listView: 'عرض القائمة',
+    mapView: 'عرض الخريطة',
+    live: 'مباشر',
+    offline: 'غير متصل',
+    showing: 'عرض',
+    of: 'من',
+    orders: 'طلبات',
+    noOrdersFound: 'لم يتم العثور على طلبات',
+    ordersWillAppear: 'ستظهر الطلبات هنا عند إنشائها.',
+    errorLoadingOrders: 'خطأ في تحميل الطلبات',
+    items: 'عناصر',
+    actions: 'الإجراءات',
+    subItems: 'العناصر الفرعية',
+    orderId: 'معرف الطلب',
+  },
+};
+
+type Language = 'en' | 'he' | 'ar';
+
+interface LanguageContextType {
+  language: Language;
+  rtl: boolean;
+  t: (key: string) => string;
+}
+
+const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+export const useLanguage = () => {
+  const context = useContext(LanguageContext);
+  if (!context) {
+    throw new Error('useLanguage must be used within a LanguageProvider');
+  }
+  return context;
+};
+
+interface LanguageProviderProps {
+  children: ReactNode;
+}
+
+export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
+  const { language, rtl } = useSelector((state: RootState) => state.settings);
+  
+  const t = (key: string): string => {
+    return translations[language as Language]?.[key as keyof typeof translations[Language]] || key;
+  };
+
+  return (
+    <LanguageContext.Provider value={{ language: language as Language, rtl, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};

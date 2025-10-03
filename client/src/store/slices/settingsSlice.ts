@@ -9,6 +9,8 @@ export interface SettingsState {
   theme: 'light' | 'dark';
   language: string;
   rtl: boolean;
+  // Filter settings
+  statusFilter: 'all' | 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered';
 }
 
 const initialState: SettingsState = {
@@ -20,6 +22,7 @@ const initialState: SettingsState = {
   theme: 'light',
   language: 'en',
   rtl: false,
+  statusFilter: 'all',
 };
 
 export const settingsSlice = createSlice({
@@ -50,6 +53,9 @@ export const settingsSlice = createSlice({
     setRtl: (state, action: PayloadAction<boolean>) => {
       state.rtl = action.payload;
     },
+    setStatusFilter: (state, action: PayloadAction<'all' | 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered'>) => {
+      state.statusFilter = action.payload;
+    },
   },
 });
 
@@ -62,4 +68,5 @@ export const {
   setTheme,
   setLanguage,
   setRtl,
+  setStatusFilter,
 } = settingsSlice.actions;
