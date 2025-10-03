@@ -37,9 +37,13 @@ export class OrderController {
         throw new AppError('Invalid order status', 400);
       }
 
-      // Get orders using raw SQL query to test database connection
-      const { AppDataSource } = await import('../config/typeorm.config');
-      const orders = await AppDataSource.query('SELECT * FROM orders LIMIT $1 OFFSET $2', [parsedLimit, parsedOffset]);
+      // Get orders using OrderService to include sub-items
+      const orders = await OrderService.getOrders({
+        status: status as OrderStatus,
+        limit: parsedLimit,
+        offset: parsedOffset,
+        includeSubItems: parsedIncludeSubItems,
+      });
 
       // Get total count for pagination (temporarily disabled)
       const totalCount = { totalOrders: orders.length };

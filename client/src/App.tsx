@@ -1,20 +1,27 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { Provider } from 'react-redux';
+import { Provider, useSelector } from 'react-redux';
 import { store } from './store/store';
 import { OrderList } from './components/OrderList';
 import { Header } from './components/Header';
 import { LanguageProvider } from './contexts/LanguageContext';
 import { Container, Box } from '@mui/material';
+import { RootState } from './store/store';
 
 // RTL languages
 const rtlLanguages = ['he', 'ar'];
 
-function App() {
-  const [language, setLanguage] = useState('en');
-  const isRTL = rtlLanguages.includes(language);
+function AppContent() {
+  const { language, rtl } = useSelector((state: RootState) => state.settings);
+  const isRTL = rtl || rtlLanguages.includes(language);
+
+  // Update document direction when language changes
+  useEffect(() => {
+    document.dir = isRTL ? 'rtl' : 'ltr';
+    document.documentElement.lang = language;
+  }, [language, isRTL]);
 
   // Create Material-UI theme with RTL support
   const theme = useMemo(() => createTheme({
@@ -29,31 +36,30 @@ function App() {
     direction: isRTL ? 'rtl' : 'ltr',
   }), [isRTL]);
 
-  const handleLanguageChange = (newLanguage: string) => {
-    setLanguage(newLanguage);
-    // Update document direction
-    document.dir = rtlLanguages.includes(newLanguage) ? 'rtl' : 'ltr';
-    document.documentElement.lang = newLanguage;
-  };
+  return (
+    <LanguageProvider>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router>
+          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+            <Header />
+            <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
+              <Routes>
+                <Route path="/" element={<OrderList />} />
+                <Route path="/orders" element={<OrderList />} />
+              </Routes>
+            </Container>
+          </Box>
+        </Router>
+      </ThemeProvider>
+    </LanguageProvider>
+  );
+}
 
+function App() {
   return (
     <Provider store={store}>
-      <LanguageProvider>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <Router>
-            <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-              <Header />
-              <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
-                <Routes>
-                  <Route path="/" element={<OrderList />} />
-                  <Route path="/orders" element={<OrderList />} />
-                </Routes>
-              </Container>
-            </Box>
-          </Router>
-        </ThemeProvider>
-      </LanguageProvider>
+      <AppContent />
     </Provider>
   );
 }

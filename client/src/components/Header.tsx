@@ -80,6 +80,16 @@ export const Header: React.FC = () => {
               '& .MuiChip-label': { fontSize: '0.75rem' }
             }} 
           />
+          {rtl && (
+            <Chip 
+              label="RTL" 
+              color="info"
+              size="small"
+              sx={{ 
+                '& .MuiChip-label': { fontSize: '0.75rem' }
+              }} 
+            />
+          )}
         </Box>
 
         {/* Settings Menu */}

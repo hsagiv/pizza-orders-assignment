@@ -10,8 +10,8 @@ import {
   OneToMany,
   Index,
 } from 'typeorm';
-import { IsString, IsNumber, IsEnum, IsOptional, Min, Max, Length } from 'class-validator';
 import { SubItem } from './SubItem.entity';
+import { IsString, IsNumber, IsEnum, IsOptional, Min, Max, Length } from 'class-validator';
 import { OrderStatus } from '../types/Order';
 
 @Entity('orders')
@@ -59,12 +59,12 @@ export class Order {
   @UpdateDateColumn({ type: 'timestamp with time zone', name: 'updated_at' })
   updatedAt!: Date;
 
-  // One-to-many relationship with SubItem (temporarily disabled)
-  // @OneToMany(() => SubItem, (subItem) => subItem.order, {
-  //   cascade: true, // Automatically save/update/delete subitems when order is saved
-  //   eager: false, // Don't automatically load subitems (use relations when needed)
-  // })
-  subItems?: any[]; // Temporarily disabled relation
+  // One-to-many relationship with SubItem
+  @OneToMany(() => SubItem, (subItem) => subItem.order, {
+    cascade: true, // Automatically save/update/delete subitems when order is saved
+    eager: false, // Don't automatically load subitems (use relations when needed)
+  })
+  subItems?: SubItem[];
 
   // Virtual properties for computed values
   get location(): { latitude: number; longitude: number } {

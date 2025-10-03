@@ -72,16 +72,10 @@ export const OrderList: React.FC = () => {
 
   // Filter and sort orders based on current settings - MUST be before any early returns
   const filteredAndSortedOrders = React.useMemo(() => {
-    // Debug: Log all orders and current filter
-    console.log('🔍 Debug - Total orders:', orders.length);
-    console.log('🔍 Debug - Current filter:', statusFilter);
-    console.log('🔍 Debug - All orders:', orders.map(o => ({ id: o.id, status: o.status, title: o.title })));
-    
     // First filter orders by status
     const filtered = statusFilter === 'all' 
       ? orders 
       : orders.filter(order => order.status === statusFilter);
-    console.log('🔍 Debug - Filtered orders:', filtered.length);
     
     // Then sort the filtered orders
     const sorted = [...filtered].sort((a, b) => {
