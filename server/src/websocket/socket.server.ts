@@ -273,12 +273,18 @@ export class SocketServer {
    * Broadcast order status changed event
    */
   public async broadcastOrderStatusChanged(order: any, oldStatus: OrderStatus): Promise<void> {
-    this.io.emit(getWebSocketConfig().events.orderStatusChanged, {
+    const eventName = getWebSocketConfig().events.orderStatusChanged;
+    const eventData = {
       success: true,
       data: order,
       oldStatus,
       timestamp: new Date().toISOString(),
-    });
+    };
+    
+    console.log(`📡 SocketServer: Emitting event '${eventName}' to all clients`);
+    console.log(`📡 SocketServer: Event data:`, eventData);
+    
+    this.io.emit(eventName, eventData);
 
     // Notify both old and new status rooms
     this.io.to(`status-${oldStatus}`).emit('order-left-status', {
@@ -292,6 +298,8 @@ export class SocketServer {
       data: order,
       timestamp: new Date().toISOString(),
     });
+    
+    console.log(`📡 SocketServer: Status change broadcast completed for order ${order.id}`);
   }
 
   /**

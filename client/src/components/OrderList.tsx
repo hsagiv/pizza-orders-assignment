@@ -60,15 +60,20 @@ export const OrderList: React.FC = () => {
   useEffect(() => {
     const handleOrderUpdate = (data: WebSocketOrderUpdate) => {
       console.log('📡 Received order update:', data);
+      console.log('📡 WebSocket event type:', data);
       // Refresh orders when real-time update is received
       dispatch(fetchOrders());
     };
 
     if (isConnected) {
+      console.log('🔌 WebSocket connected, subscribing to order updates');
       subscribeToOrderUpdates(handleOrderUpdate);
+    } else {
+      console.log('🔌 WebSocket not connected, cannot subscribe to updates');
     }
 
     return () => {
+      console.log('🔌 Unsubscribing from order updates');
       unsubscribeFromOrderUpdates(handleOrderUpdate);
     };
   }, [isConnected, dispatch, subscribeToOrderUpdates, unsubscribeFromOrderUpdates]);

@@ -166,6 +166,16 @@ export class OrderController {
         throw new AppError('Order not found', 404);
       }
 
+      // Broadcast order updated event via WebSocket
+      try {
+        const wsService = WebSocketService.getInstance();
+        await wsService.broadcastOrderUpdated(order);
+        console.log(`📡 Broadcasted order updated: ${order.id}`);
+      } catch (wsError) {
+        console.warn('⚠️  Failed to broadcast order updated:', wsError);
+        // Don't fail the request if WebSocket broadcast fails
+      }
+
       const response = {
         success: true,
         data: order,
@@ -195,10 +205,31 @@ export class OrderController {
         throw new AppError('Valid order status is required', 400);
       }
 
+      // Get the current order to track the old status
+      const currentOrder = await OrderService.getOrderById(id, false);
+      const oldStatus = currentOrder?.status;
+
       const order = await OrderService.updateOrderStatus(id, status);
 
       if (!order) {
         throw new AppError('Order not found', 404);
+      }
+
+      // Broadcast order status changed event via WebSocket
+      try {
+        const wsService = WebSocketService.getInstance();
+        console.log(`📡 Attempting to broadcast status change for order ${order.id}`);
+        if (oldStatus) {
+          await wsService.broadcastOrderStatusChanged(order, oldStatus);
+          console.log(`📡 Successfully broadcasted status change: ${order.id} from ${oldStatus} to ${order.status}`);
+        } else {
+          // If we can't determine old status, just broadcast as updated
+          await wsService.broadcastOrderUpdated(order);
+          console.log(`📡 Successfully broadcasted order updated: ${order.id}`);
+        }
+      } catch (wsError) {
+        console.error('❌ Failed to broadcast status change:', wsError);
+        // Don't fail the request if WebSocket broadcast fails
       }
 
       const response = {
@@ -229,6 +260,16 @@ export class OrderController {
 
       if (!deleted) {
         throw new AppError('Order not found', 404);
+      }
+
+      // Broadcast order deleted event via WebSocket
+      try {
+        const wsService = WebSocketService.getInstance();
+        await wsService.broadcastOrderDeleted(id);
+        console.log(`📡 Broadcasted order deleted: ${id}`);
+      } catch (wsError) {
+        console.warn('⚠️  Failed to broadcast order deleted:', wsError);
+        // Don't fail the request if WebSocket broadcast fails
       }
 
       const response = {

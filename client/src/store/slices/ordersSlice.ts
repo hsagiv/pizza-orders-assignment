@@ -124,9 +124,11 @@ export const ordersSlice = createSlice({
       })
       .addCase(updateOrderStatus.fulfilled, (state, action) => {
         state.loading = false;
-        const index = state.orders.findIndex(order => order.id === action.payload.id);
+        // The API returns { success: true, data: order, ... }
+        const updatedOrder = action.payload.data;
+        const index = state.orders.findIndex(order => order.id === updatedOrder.id);
         if (index !== -1) {
-          state.orders[index] = action.payload;
+          state.orders[index] = updatedOrder;
           state.lastUpdated = new Date().toISOString();
         }
       })
