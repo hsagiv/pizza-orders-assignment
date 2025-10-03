@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
+import { validateOrdersResponse } from '../../utils/apiValidation';
 
 // Types
 export interface Order {
@@ -47,7 +48,11 @@ export const fetchOrders = createAsyncThunk(
         throw new Error('Failed to fetch orders');
       }
       const data = await response.json();
-      return data;
+      
+      // Handle nested response structure
+      const ordersData = data.data || data;
+      const validatedOrders = validateOrdersResponse(ordersData);
+      return validatedOrders;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
     }
@@ -105,7 +110,7 @@ export const ordersSlice = createSlice({
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.loading = false;
         // Extract the data array from the API response
-        state.orders = action.payload.data || action.payload;
+        state.orders = action.payload;
         state.lastUpdated = new Date().toISOString();
       })
       .addCase(fetchOrders.rejected, (state, action) => {

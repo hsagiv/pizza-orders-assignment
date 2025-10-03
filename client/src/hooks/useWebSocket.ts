@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { WebSocketOrderUpdate } from '../types/websocket';
 
 /**
  * Custom hook for WebSocket connection management
@@ -46,7 +47,7 @@ export const useWebSocket = (url: string) => {
   }, [url]);
 
   // Subscribe to order updates
-  const subscribeToOrderUpdates = (callback: (data: any) => void) => {
+  const subscribeToOrderUpdates = (callback: (data: WebSocketOrderUpdate) => void) => {
     if (socketRef.current) {
       // Listen for multiple order events
       socketRef.current.on('order:created', callback);
@@ -59,7 +60,7 @@ export const useWebSocket = (url: string) => {
   };
 
   // Unsubscribe from order updates
-  const unsubscribeFromOrderUpdates = (callback: (data: any) => void) => {
+  const unsubscribeFromOrderUpdates = (callback: (data: WebSocketOrderUpdate) => void) => {
     if (socketRef.current) {
       // Unsubscribe from all order events
       socketRef.current.off('order:created', callback);

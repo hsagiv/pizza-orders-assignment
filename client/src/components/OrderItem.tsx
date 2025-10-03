@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import {
   Card,
   CardContent,
@@ -18,6 +18,7 @@ import {
 } from '@mui/icons-material';
 import { Order } from '../store/slices/ordersSlice';
 import { StatusBadge } from './StatusBadge';
+import { formatCoordinates, formatTime } from '../utils/formatUtils';
 
 interface OrderItemProps {
   order: Order;
@@ -26,30 +27,10 @@ interface OrderItemProps {
 
 // Status configuration removed - now using StatusBadge component
 
-export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) => {
-  const handleStatusChange = (event: SelectChangeEvent<string>) => {
+export const OrderItem: React.FC<OrderItemProps> = React.memo(({ order, onStatusUpdate }) => {
+  const handleStatusChange = useCallback((event: SelectChangeEvent<string>) => {
     onStatusUpdate(order.id, event.target.value);
-  };
-
-  const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleString();
-  };
-
-  // Helper function to safely format coordinates
-  const formatCoordinates = (lat: number | string, lng: number | string) => {
-    try {
-      const latitude = Number(lat);
-      const longitude = Number(lng);
-      if (isNaN(latitude) || isNaN(longitude)) {
-        return 'Invalid coordinates';
-      }
-      return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-    } catch (error) {
-      return 'Invalid coordinates';
-    }
-  };
-
-// Status helper functions removed - now using StatusBadge component
+  }, [order.id, onStatusUpdate]);
 
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -126,4 +107,4 @@ export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) =
       </CardContent>
     </Card>
   );
-};
+});

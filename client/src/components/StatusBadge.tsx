@@ -47,7 +47,7 @@ const statusConfig = {
   },
 } as const;
 
-export const StatusBadge: React.FC<StatusBadgeProps> = ({
+export const StatusBadge: React.FC<StatusBadgeProps> = React.memo(({
   status,
   size = 'small',
   variant = 'filled',
@@ -60,7 +60,7 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   const IconComponent = config.icon;
   const displayLabel = customLabel || config.label;
 
-  const chipProps: any = {
+  const chipProps: React.ComponentProps<typeof Chip> = {
     label: showLabel ? displayLabel : undefined,
     color: config.color,
     size: size,
@@ -82,6 +82,6 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   }
 
   return <Chip {...chipProps} />;
-};
+});
 
 export default StatusBadge;

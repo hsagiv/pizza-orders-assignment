@@ -7,6 +7,7 @@ import { store } from './store/store';
 import { OrderList } from './components/OrderList';
 import { Header } from './components/Header';
 import { LanguageProvider } from './contexts/LanguageContext';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Container, Box } from '@mui/material';
 import { RootState } from './store/store';
 
@@ -36,24 +37,26 @@ function AppContent() {
     direction: isRTL ? 'rtl' : 'ltr',
   }), [isRTL]);
 
-  return (
-    <LanguageProvider>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <Router>
-          <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-            <Header />
-            <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
-              <Routes>
-                <Route path="/" element={<OrderList />} />
-                <Route path="/orders" element={<OrderList />} />
-              </Routes>
-            </Container>
-          </Box>
-        </Router>
-      </ThemeProvider>
-    </LanguageProvider>
-  );
+      return (
+        <ErrorBoundary>
+          <LanguageProvider>
+            <ThemeProvider theme={theme}>
+              <CssBaseline />
+              <Router>
+                <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+                  <Header />
+                  <Container maxWidth="lg" sx={{ flex: 1, py: 3 }}>
+                    <Routes>
+                      <Route path="/" element={<OrderList />} />
+                      <Route path="/orders" element={<OrderList />} />
+                    </Routes>
+                  </Container>
+                </Box>
+              </Router>
+            </ThemeProvider>
+          </LanguageProvider>
+        </ErrorBoundary>
+      );
 }
 
 function App() {

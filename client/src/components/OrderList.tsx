@@ -31,11 +31,12 @@ import {
 import { AppDispatch, RootState } from '../store/store';
 import { fetchOrders, updateOrderStatus } from '../store/slices/ordersSlice';
 import { Order } from '../store/slices/ordersSlice';
-import { OrderItem } from './OrderItem';
-import { OrderMap } from './OrderMap';
+import { LazyMap } from './LazyMap';
 import { StatusBadge } from './StatusBadge';
 import { useWebSocket } from '../hooks/useWebSocket';
 import { setStatusFilter, setShowAll } from '../store/slices/settingsSlice';
+import { formatCoordinates, formatTime, formatOrderId } from '../utils/formatUtils';
+import { WebSocketOrderUpdate } from '../types/websocket';
 
 export const OrderList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -55,7 +56,7 @@ export const OrderList: React.FC = () => {
 
   // Subscribe to real-time order updates
   useEffect(() => {
-    const handleOrderUpdate = (data: any) => {
+    const handleOrderUpdate = (data: WebSocketOrderUpdate) => {
       console.log('📡 Received order update:', data);
       // Refresh orders when real-time update is received
       dispatch(fetchOrders());
@@ -117,19 +118,6 @@ export const OrderList: React.FC = () => {
     dispatch(updateOrderStatus({ orderId, status: newStatus }));
   };
 
-  // Helper function to safely format coordinates
-  const formatCoordinates = (lat: number | string, lng: number | string) => {
-    try {
-      const latitude = Number(lat);
-      const longitude = Number(lng);
-      if (isNaN(latitude) || isNaN(longitude)) {
-        return 'Invalid coordinates';
-      }
-      return `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
-    } catch (error) {
-      return 'Invalid coordinates';
-    }
-  };
 
   if (loading && orders.length === 0) {
     return (
@@ -332,7 +320,7 @@ export const OrderList: React.FC = () => {
               {filteredAndSortedOrders.slice(0, showAll ? filteredAndSortedOrders.length : ordersPerPage).map((order) => (
                 <TableRow key={order.id} hover>
                   <TableCell component="th" scope="row">
-                    {order.id.substring(0, 8)}...
+                        {formatOrderId(order.id)}
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2" fontWeight="medium">
@@ -357,7 +345,7 @@ export const OrderList: React.FC = () => {
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                       <TimeIcon fontSize="small" color="action" />
                       <Typography variant="body2">
-                        {new Date(order.orderTime).toLocaleString()}
+                            {formatTime(order.orderTime)}
                       </Typography>
                     </Box>
                   </TableCell>
@@ -390,10 +378,10 @@ export const OrderList: React.FC = () => {
           </Table>
         </TableContainer>
       ) : (
-        <OrderMap
-          orders={orders}
+        <LazyMap
+          orders={filteredAndSortedOrders}
           onOrderSelect={handleOrderSelect}
-          {...(selectedOrderId && { selectedOrderId })}
+          selectedOrderId={selectedOrderId}
         />
       )}
 

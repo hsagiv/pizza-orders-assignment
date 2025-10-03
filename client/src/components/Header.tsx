@@ -68,7 +68,7 @@ export const Header: React.FC = () => {
         {/* Logo and Title */}
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1 }}>
           <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-            🍕 Tictuk Pizza
+            🍕 Sagiv & Tictuk Pizza
           </Typography>
           <Chip 
             label="Order Management" 
