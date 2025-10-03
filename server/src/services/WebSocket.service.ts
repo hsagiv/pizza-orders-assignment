@@ -6,7 +6,18 @@ import { OrderService } from './Order.service';
 import { OrderStatus } from '../types/Order';
 
 export class WebSocketService {
+  private static instance: WebSocketService;
   private socketServer: SocketServer | null = null;
+
+  /**
+   * Get singleton instance
+   */
+  public static getInstance(): WebSocketService {
+    if (!WebSocketService.instance) {
+      WebSocketService.instance = new WebSocketService();
+    }
+    return WebSocketService.instance;
+  }
 
   /**
    * Initialize WebSocket service

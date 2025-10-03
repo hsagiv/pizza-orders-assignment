@@ -3,6 +3,7 @@
 
 import { Request, Response } from 'express';
 import { OrderService } from '../services/Order.service';
+import { WebSocketService } from '../services/WebSocket.service';
 import { AppError } from '../middleware/error.middleware';
 import { OrderStatus } from '../types/Order';
 import { getApiConfig } from '../config/app.config';
@@ -119,6 +120,16 @@ export class OrderController {
       }
 
       const order = await OrderService.createOrder(orderData);
+
+      // Broadcast order created event via WebSocket
+      try {
+        const wsService = WebSocketService.getInstance();
+        await wsService.broadcastOrderCreated(order);
+        console.log(`📡 Broadcasted order created: ${order.id}`);
+      } catch (wsError) {
+        console.warn('⚠️  Failed to broadcast order created:', wsError);
+        // Don't fail the request if WebSocket broadcast fails
+      }
 
       const response = {
         success: true,

@@ -105,6 +105,12 @@ async function startServer() {
     const socketServer = new SocketServer(server);
     console.log('✅ WebSocket server initialized');
     
+    // Initialize WebSocket service
+    const { WebSocketService } = await import('./services/WebSocket.service');
+    const wsService = WebSocketService.getInstance();
+    wsService.initialize(socketServer);
+    console.log('✅ WebSocket service initialized');
+    
     // Graceful shutdown
     process.on('SIGTERM', () => {
       console.log('🛑 SIGTERM received, shutting down gracefully...');

@@ -48,6 +48,12 @@ export const useWebSocket = (url: string) => {
   // Subscribe to order updates
   const subscribeToOrderUpdates = (callback: (data: any) => void) => {
     if (socketRef.current) {
+      // Listen for multiple order events
+      socketRef.current.on('order:created', callback);
+      socketRef.current.on('order:updated', callback);
+      socketRef.current.on('order:status-changed', callback);
+      socketRef.current.on('order:deleted', callback);
+      // Legacy support
       socketRef.current.on('orderUpdated', callback);
     }
   };
@@ -55,6 +61,12 @@ export const useWebSocket = (url: string) => {
   // Unsubscribe from order updates
   const unsubscribeFromOrderUpdates = (callback: (data: any) => void) => {
     if (socketRef.current) {
+      // Unsubscribe from all order events
+      socketRef.current.off('order:created', callback);
+      socketRef.current.off('order:updated', callback);
+      socketRef.current.off('order:status-changed', callback);
+      socketRef.current.off('order:deleted', callback);
+      // Legacy support
       socketRef.current.off('orderUpdated', callback);
     }
   };

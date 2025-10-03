@@ -39,7 +39,7 @@ export class Order {
   @Max(180, { message: 'Longitude must be between -180 and 180' })
   longitude!: number;
 
-  @Column({ type: 'timestamp with time zone', default: () => 'NOW()' })
+  @Column({ type: 'timestamp with time zone', default: () => 'NOW()', name: 'order_time' })
   @IsOptional()
   orderTime!: Date;
 
@@ -53,10 +53,10 @@ export class Order {
   })
   status!: OrderStatus;
 
-  @CreateDateColumn({ type: 'timestamp with time zone' })
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  @UpdateDateColumn({ type: 'timestamp with time zone', name: 'updated_at' })
   updatedAt!: Date;
 
   // One-to-many relationship with SubItem (temporarily disabled)

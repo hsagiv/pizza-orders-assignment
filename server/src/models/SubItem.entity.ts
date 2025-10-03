@@ -22,7 +22,7 @@ export class SubItem {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ type: 'uuid' })
+  @Column({ type: 'uuid', name: 'order_id' })
   orderId!: string;
 
   @Column({ type: 'varchar', length: 255 })
@@ -45,10 +45,10 @@ export class SubItem {
   })
   type!: SubItemType;
 
-  @CreateDateColumn({ type: 'timestamp with time zone' })
+  @CreateDateColumn({ type: 'timestamp with time zone', name: 'created_at' })
   createdAt!: Date;
 
-  @UpdateDateColumn({ type: 'timestamp with time zone' })
+  @UpdateDateColumn({ type: 'timestamp with time zone', name: 'updated_at' })
   updatedAt!: Date;
 
   // Many-to-one relationship with Order
@@ -56,7 +56,7 @@ export class SubItem {
     onDelete: 'CASCADE', // Delete subitem if order is deleted
     nullable: false,
   })
-  @JoinColumn({ name: 'orderId' })
+  @JoinColumn({ name: 'order_id' })
   order!: Order;
 
   // Virtual properties for computed values
