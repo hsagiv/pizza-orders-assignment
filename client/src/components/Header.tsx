@@ -22,6 +22,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store/store';
 import { setTheme, setLanguage, setRtl, setAutoRefresh } from '../store/slices/settingsSlice';
+import { useLanguage } from '../contexts/LanguageContext';
 
 /**
  * Header component with navigation and settings
@@ -30,6 +31,7 @@ import { setTheme, setLanguage, setRtl, setAutoRefresh } from '../store/slices/s
 export const Header: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { theme, language, rtl, autoRefresh } = useSelector((state: RootState) => state.settings);
+  const { t } = useLanguage();
   
   const [settingsAnchor, setSettingsAnchor] = useState<null | HTMLElement>(null);
   const [languageAnchor, setLanguageAnchor] = useState<null | HTMLElement>(null);
@@ -71,7 +73,7 @@ export const Header: React.FC = () => {
             🍕 Sagiv & Tictuk Pizza
           </Typography>
           <Chip 
-            label="Order Management" 
+            label={t('orderManagement')} 
             size="small" 
             variant="outlined" 
             sx={{ 
@@ -112,14 +114,14 @@ export const Header: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 1 }}>
               {theme === 'light' ? <LightModeIcon /> : <DarkModeIcon />}
             </Box>
-            {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
+            {theme === 'light' ? t('darkMode') : t('lightMode')}
           </MenuItem>
           
           <MenuItem onClick={handleAutoRefreshToggle}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 1 }}>
               <RefreshIcon />
             </Box>
-            Auto Refresh: {autoRefresh ? 'On' : 'Off'}
+            {t('autoRefresh')}: {autoRefresh ? t('on') : t('off')}
           </MenuItem>
 
           <Divider />
@@ -128,7 +130,7 @@ export const Header: React.FC = () => {
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mr: 1 }}>
               <LanguageIcon />
             </Box>
-            Language: {language.toUpperCase()}
+            {t('language')}: {language.toUpperCase()}
           </MenuItem>
         </Menu>
 

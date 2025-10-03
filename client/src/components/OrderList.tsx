@@ -37,11 +37,13 @@ import { useWebSocket } from '../hooks/useWebSocket';
 import { setStatusFilter, setShowAll } from '../store/slices/settingsSlice';
 import { formatCoordinates, formatTime, formatOrderId } from '../utils/formatUtils';
 import { WebSocketOrderUpdate } from '../types/websocket';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export const OrderList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { orders, loading, error } = useSelector((state: RootState) => state.orders);
   const { ordersPerPage, showAll, sortBy, sortOrder, statusFilter } = useSelector((state: RootState) => state.settings);
+  const { t } = useLanguage();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(undefined);
 
@@ -182,7 +184,7 @@ export const OrderList: React.FC = () => {
                   }}
                 />
                 <Typography variant="caption" color="text.secondary">
-                  {isConnected ? 'Live' : 'Offline'}
+                  {isConnected ? t('live') : t('offline')}
                 </Typography>
                 {showAll && (
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 1 }}>
@@ -195,67 +197,67 @@ export const OrderList: React.FC = () => {
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Filter</InputLabel>
+            <InputLabel>{t('filter')}</InputLabel>
             <Select
               value={statusFilter}
-              label="Filter"
+              label={t('filter')}
               onChange={(e) => dispatch({ type: 'settings/setStatusFilter', payload: e.target.value })}
             >
-              <MenuItem value="all">All Orders</MenuItem>
-              <MenuItem value="Received">Received</MenuItem>
-              <MenuItem value="Preparing">Preparing</MenuItem>
-              <MenuItem value="Ready">Ready</MenuItem>
-              <MenuItem value="En-Route">En Route</MenuItem>
-              <MenuItem value="Delivered">Delivered</MenuItem>
+              <MenuItem value="all">{t('allOrders')}</MenuItem>
+              <MenuItem value="Received">{t('received')}</MenuItem>
+              <MenuItem value="Preparing">{t('preparing')}</MenuItem>
+              <MenuItem value="Ready">{t('ready')}</MenuItem>
+              <MenuItem value="En-Route">{t('enRoute')}</MenuItem>
+              <MenuItem value="Delivered">{t('delivered')}</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Sort By</InputLabel>
+            <InputLabel>{t('sortBy')}</InputLabel>
             <Select
               value={sortBy}
-              label="Sort By"
+              label={t('sortBy')}
               onChange={(e) => dispatch({ type: 'settings/setSortBy', payload: e.target.value })}
             >
-              <MenuItem value="orderTime">Order Time</MenuItem>
-              <MenuItem value="status">Status</MenuItem>
-              <MenuItem value="title">Title</MenuItem>
-              <MenuItem value="location">Location</MenuItem>
+              <MenuItem value="orderTime">{t('orderTime')}</MenuItem>
+              <MenuItem value="status">{t('status')}</MenuItem>
+              <MenuItem value="title">{t('title')}</MenuItem>
+              <MenuItem value="location">{t('location')}</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Order</InputLabel>
+            <InputLabel>{t('order')}</InputLabel>
             <Select
               value={sortOrder}
-              label="Order"
+              label={t('order')}
               onChange={(e) => dispatch({ type: 'settings/setSortOrder', payload: e.target.value })}
             >
-              <MenuItem value="asc">Ascending</MenuItem>
-              <MenuItem value="desc">Descending</MenuItem>
+              <MenuItem value="asc">{t('ascending')}</MenuItem>
+              <MenuItem value="desc">{t('descending')}</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Per Page</InputLabel>
+            <InputLabel>{t('perPage')}</InputLabel>
             <Select
               value={ordersPerPage}
-              label="Per Page"
+              label={t('perPage')}
               disabled={showAll}
               onChange={(e) => dispatch({ type: 'settings/setOrdersPerPage', payload: Number(e.target.value) })}
             >
-              <MenuItem value={1}>1 Order</MenuItem>
-              <MenuItem value={2}>2 Orders</MenuItem>
-              <MenuItem value={3}>3 Orders</MenuItem>
-              <MenuItem value={4}>4 Orders</MenuItem>
+              <MenuItem value={1}>{t('oneOrder')}</MenuItem>
+              <MenuItem value={2}>{t('twoOrders')}</MenuItem>
+              <MenuItem value={3}>{t('threeOrders')}</MenuItem>
+              <MenuItem value={4}>{t('fourOrders')}</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 120 }}>
-            <InputLabel>Display</InputLabel>
+            <InputLabel>{t('display')}</InputLabel>
             <Select
               value={showAll ? 'all' : 'paginated'}
-              label="Display"
+              label={t('display')}
               onChange={(e) => dispatch(setShowAll(e.target.value === 'all'))}
             >
-              <MenuItem value="paginated">Paginated</MenuItem>
-              <MenuItem value="all">Show All</MenuItem>
+              <MenuItem value="paginated">{t('paginated')}</MenuItem>
+              <MenuItem value="all">{t('showAll')}</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -268,8 +270,8 @@ export const OrderList: React.FC = () => {
           onChange={(e, newValue) => setViewMode(newValue)}
           sx={{ borderBottom: 1, borderColor: 'divider' }}
         >
-          <Tab label="List View" value="list" />
-          <Tab label="Map View" value="map" />
+          <Tab label={t('listView')} value="list" />
+          <Tab label={t('mapView')} value="map" />
         </Tabs>
       </Box>
 
@@ -279,10 +281,10 @@ export const OrderList: React.FC = () => {
           <Table sx={{ minWidth: 650 }} aria-label="orders table">
             <TableHead>
               <TableRow>
-                <TableCell><strong>Order ID</strong></TableCell>
+                <TableCell><strong>{t('orderId')}</strong></TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <strong>Title</strong>
+                    <strong>{t('title')}</strong>
                     {sortBy === 'title' && (
                       sortOrder === 'asc' ? <ArrowUpIcon fontSize="small" /> : <ArrowDownIcon fontSize="small" />
                     )}
@@ -290,7 +292,7 @@ export const OrderList: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <strong>Status</strong>
+                    <strong>{t('status')}</strong>
                     {sortBy === 'status' && (
                       sortOrder === 'asc' ? <ArrowUpIcon fontSize="small" /> : <ArrowDownIcon fontSize="small" />
                     )}
@@ -298,7 +300,7 @@ export const OrderList: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <strong>Location</strong>
+                    <strong>{t('location')}</strong>
                     {sortBy === 'location' && (
                       sortOrder === 'asc' ? <ArrowUpIcon fontSize="small" /> : <ArrowDownIcon fontSize="small" />
                     )}
@@ -306,14 +308,14 @@ export const OrderList: React.FC = () => {
                 </TableCell>
                 <TableCell>
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                    <strong>Order Time</strong>
+                    <strong>{t('orderTime')}</strong>
                     {sortBy === 'orderTime' && (
                       sortOrder === 'asc' ? <ArrowUpIcon fontSize="small" /> : <ArrowDownIcon fontSize="small" />
                     )}
                   </Box>
                 </TableCell>
-                <TableCell><strong>Sub-Items</strong></TableCell>
-                <TableCell><strong>Actions</strong></TableCell>
+                <TableCell><strong>{t('subItems')}</strong></TableCell>
+                <TableCell><strong>{t('actions')}</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
