@@ -1,5 +1,14 @@
-// Main server entry point
-// This file initializes the Express server with all middleware and routes
+/**
+ * Main server entry point
+ * This file initializes the Express server with all middleware and routes
+ * 
+ * Features:
+ * - RESTful API for order management
+ * - WebSocket support for real-time updates
+ * - Database integration with TypeORM
+ * - Security middleware (CORS, Helmet, Rate Limiting)
+ * - Error handling and logging
+ */
 
 import express from 'express';
 import cors from 'cors';

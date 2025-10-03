@@ -218,14 +218,11 @@ export class OrderController {
       // Broadcast order status changed event via WebSocket
       try {
         const wsService = WebSocketService.getInstance();
-        console.log(`📡 Attempting to broadcast status change for order ${order.id}`);
         if (oldStatus) {
           await wsService.broadcastOrderStatusChanged(order, oldStatus);
-          console.log(`📡 Successfully broadcasted status change: ${order.id} from ${oldStatus} to ${order.status}`);
         } else {
           // If we can't determine old status, just broadcast as updated
           await wsService.broadcastOrderUpdated(order);
-          console.log(`📡 Successfully broadcasted order updated: ${order.id}`);
         }
       } catch (wsError) {
         console.error('❌ Failed to broadcast status change:', wsError);

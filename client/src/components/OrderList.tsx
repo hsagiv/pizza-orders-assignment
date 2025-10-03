@@ -39,6 +39,17 @@ import { formatCoordinates, formatTime, formatOrderId } from '../utils/formatUti
 import { WebSocketOrderUpdate } from '../types/websocket';
 import { useLanguage } from '../contexts/LanguageContext';
 
+/**
+ * OrderList Component
+ * 
+ * Main component for displaying and managing pizza orders
+ * Features:
+ * - Real-time order updates via WebSocket
+ * - Order status management
+ * - List and map view modes
+ * - Sorting and filtering capabilities
+ * - Responsive design with Material-UI
+ */
 export const OrderList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { orders, loading, error } = useSelector((state: RootState) => state.orders);
@@ -59,21 +70,15 @@ export const OrderList: React.FC = () => {
   // Subscribe to real-time order updates
   useEffect(() => {
     const handleOrderUpdate = (data: WebSocketOrderUpdate) => {
-      console.log('📡 Received order update:', data);
-      console.log('📡 WebSocket event type:', data);
       // Refresh orders when real-time update is received
       dispatch(fetchOrders());
     };
 
     if (isConnected) {
-      console.log('🔌 WebSocket connected, subscribing to order updates');
       subscribeToOrderUpdates(handleOrderUpdate);
-    } else {
-      console.log('🔌 WebSocket not connected, cannot subscribe to updates');
     }
 
     return () => {
-      console.log('🔌 Unsubscribing from order updates');
       unsubscribeFromOrderUpdates(handleOrderUpdate);
     };
   }, [isConnected, dispatch, subscribeToOrderUpdates, unsubscribeFromOrderUpdates]);

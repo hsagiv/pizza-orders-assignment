@@ -1,5 +1,14 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
-import { validateOrdersResponse } from '../../utils/apiValidation';
+
+/**
+ * Order Management Redux Slice
+ * 
+ * Handles all order-related state management including:
+ * - Fetching orders from API
+ * - Updating order status
+ * - Real-time WebSocket integration
+ * - State persistence
+ */
 
 // Types
 export interface Order {
@@ -52,8 +61,7 @@ export const fetchOrders = createAsyncThunk(
       
       // Handle nested response structure
       const ordersData = data.data || data;
-      const validatedOrders = validateOrdersResponse(ordersData);
-      return validatedOrders;
+      return ordersData;
     } catch (error) {
       return rejectWithValue(error instanceof Error ? error.message : 'Unknown error');
     }

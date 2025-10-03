@@ -281,9 +281,6 @@ export class SocketServer {
       timestamp: new Date().toISOString(),
     };
     
-    console.log(`📡 SocketServer: Emitting event '${eventName}' to all clients`);
-    console.log(`📡 SocketServer: Event data:`, eventData);
-    
     this.io.emit(eventName, eventData);
 
     // Notify both old and new status rooms
@@ -298,8 +295,6 @@ export class SocketServer {
       data: order,
       timestamp: new Date().toISOString(),
     });
-    
-    console.log(`📡 SocketServer: Status change broadcast completed for order ${order.id}`);
   }
 
   /**

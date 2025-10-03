@@ -71,9 +71,7 @@ export class WebSocketService {
     }
 
     try {
-      console.log(`📡 WebSocketService: Broadcasting status change for order ${order.id}`);
       await this.socketServer.broadcastOrderStatusChanged(order, oldStatus);
-      console.log(`📡 WebSocketService: Successfully broadcasted status change: ${order.id} from ${oldStatus} to ${order.status}`);
     } catch (error) {
       console.error('❌ WebSocketService: Error broadcasting status change:', error);
     }

@@ -5,6 +5,9 @@ import { WebSocketOrderUpdate } from '../types/websocket';
 /**
  * Custom hook for WebSocket connection management
  * Provides real-time updates for order status changes
+ * 
+ * @param url - WebSocket server URL
+ * @returns WebSocket connection state and methods
  */
 export const useWebSocket = (url: string) => {
   const [isConnected, setIsConnected] = useState(false);
@@ -46,7 +49,10 @@ export const useWebSocket = (url: string) => {
     };
   }, [url]);
 
-  // Subscribe to order updates
+  /**
+   * Subscribe to order updates from WebSocket
+   * @param callback - Function to call when order updates are received
+   */
   const subscribeToOrderUpdates = (callback: (data: WebSocketOrderUpdate) => void) => {
     if (socketRef.current) {
       // Listen for multiple order events
@@ -59,7 +65,10 @@ export const useWebSocket = (url: string) => {
     }
   };
 
-  // Unsubscribe from order updates
+  /**
+   * Unsubscribe from order updates
+   * @param callback - Function to remove from event listeners
+   */
   const unsubscribeFromOrderUpdates = (callback: (data: WebSocketOrderUpdate) => void) => {
     if (socketRef.current) {
       // Unsubscribe from all order events
@@ -72,7 +81,11 @@ export const useWebSocket = (url: string) => {
     }
   };
 
-  // Emit order status update
+  /**
+   * Emit order status update to WebSocket server
+   * @param orderId - ID of the order to update
+   * @param status - New status for the order
+   */
   const emitOrderStatusUpdate = (orderId: string, status: string) => {
     if (socketRef.current && isConnected) {
       socketRef.current.emit('updateOrderStatus', { orderId, status });
