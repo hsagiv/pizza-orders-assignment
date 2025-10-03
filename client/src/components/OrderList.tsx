@@ -25,6 +25,8 @@ import {
   LocationOn as LocationIcon,
   AccessTime as TimeIcon,
   Restaurant as RestaurantIcon,
+  ArrowUpward as ArrowUpIcon,
+  ArrowDownward as ArrowDownIcon,
 } from '@mui/icons-material';
 import { AppDispatch, RootState } from '../store/store';
 import { fetchOrders, updateOrderStatus } from '../store/slices/ordersSlice';
@@ -43,6 +45,43 @@ export const OrderList: React.FC = () => {
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch]);
+
+  // Sort orders based on current settings - MUST be before any early returns
+  const sortedOrders = React.useMemo(() => {
+    const sorted = [...orders].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'orderTime':
+          comparison = new Date(a.orderTime).getTime() - new Date(b.orderTime).getTime();
+          break;
+        case 'status':
+          comparison = a.status.localeCompare(b.status);
+          break;
+        case 'title':
+          comparison = a.title.localeCompare(b.title);
+          break;
+        case 'location':
+          // Sort by distance from center (Manhattan coordinates as reference)
+          const centerLat = 40.7128;
+          const centerLng = -74.0060;
+          const distanceA = Math.sqrt(
+            Math.pow(Number(a.latitude) - centerLat, 2) + Math.pow(Number(a.longitude) - centerLng, 2)
+          );
+          const distanceB = Math.sqrt(
+            Math.pow(Number(b.latitude) - centerLat, 2) + Math.pow(Number(b.longitude) - centerLng, 2)
+          );
+          comparison = distanceA - distanceB;
+          break;
+        default:
+          comparison = 0;
+      }
+      
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+    
+    return sorted;
+  }, [orders, sortBy, sortOrder]);
 
   const handleStatusUpdate = (orderId: string, newStatus: string) => {
     dispatch(updateOrderStatus({ orderId, status: newStatus }));
@@ -112,6 +151,7 @@ export const OrderList: React.FC = () => {
               <MenuItem value="orderTime">Order Time</MenuItem>
               <MenuItem value="status">Status</MenuItem>
               <MenuItem value="title">Title</MenuItem>
+              <MenuItem value="location">Location</MenuItem>
             </Select>
           </FormControl>
           <FormControl size="small" sx={{ minWidth: 120 }}>
@@ -147,16 +187,44 @@ export const OrderList: React.FC = () => {
             <TableHead>
               <TableRow>
                 <TableCell><strong>Order ID</strong></TableCell>
-                <TableCell><strong>Title</strong></TableCell>
-                <TableCell><strong>Status</strong></TableCell>
-                <TableCell><strong>Location</strong></TableCell>
-                <TableCell><strong>Order Time</strong></TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <strong>Title</strong>
+                    {sortBy === 'title' && (
+                      sortOrder === 'asc' ? <ArrowUpIcon fontSize="small" /> : <ArrowDownIcon fontSize="small" />
+                    )}
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <strong>Status</strong>
+                    {sortBy === 'status' && (
+                      sortOrder === 'asc' ? <ArrowUpIcon fontSize="small" /> : <ArrowDownIcon fontSize="small" />
+                    )}
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <strong>Location</strong>
+                    {sortBy === 'location' && (
+                      sortOrder === 'asc' ? <ArrowUpIcon fontSize="small" /> : <ArrowDownIcon fontSize="small" />
+                    )}
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                    <strong>Order Time</strong>
+                    {sortBy === 'orderTime' && (
+                      sortOrder === 'asc' ? <ArrowUpIcon fontSize="small" /> : <ArrowDownIcon fontSize="small" />
+                    )}
+                  </Box>
+                </TableCell>
                 <TableCell><strong>Sub-Items</strong></TableCell>
                 <TableCell><strong>Actions</strong></TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {orders.slice(0, ordersPerPage).map((order) => (
+              {sortedOrders.slice(0, ordersPerPage).map((order) => (
                 <TableRow key={order.id} hover>
                   <TableCell component="th" scope="row">
                     {order.id.substring(0, 8)}...
@@ -224,10 +292,10 @@ export const OrderList: React.FC = () => {
         />
       )}
 
-      {orders.length > ordersPerPage && (
+      {sortedOrders.length > ordersPerPage && (
         <Box sx={{ mt: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
-            Showing {ordersPerPage} of {orders.length} orders
+            Showing {ordersPerPage} of {sortedOrders.length} orders
           </Typography>
         </Box>
       )}

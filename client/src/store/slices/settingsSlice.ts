@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface SettingsState {
   ordersPerPage: number;
-  sortBy: 'orderTime' | 'status' | 'title';
+  sortBy: 'orderTime' | 'status' | 'title' | 'location';
   sortOrder: 'asc' | 'desc';
   autoRefresh: boolean;
   refreshInterval: number;
