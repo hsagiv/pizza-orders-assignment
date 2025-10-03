@@ -54,29 +54,34 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
   showIcon = true,
   showLabel = true,
   customLabel,
+  ...rest
 }) => {
   const config = statusConfig[status];
   const IconComponent = config.icon;
   const displayLabel = customLabel || config.label;
 
-  return (
-    <Chip
-      icon={showIcon ? <IconComponent /> : undefined}
-      label={showLabel ? displayLabel : undefined}
-      color={config.color}
-      size={size}
-      variant={variant}
-      sx={{
-        fontWeight: 600,
-        '& .MuiChip-icon': {
-          fontSize: size === 'small' ? '16px' : '20px',
-        },
-        '& .MuiChip-label': {
-          fontSize: size === 'small' ? '0.75rem' : '0.875rem',
-        },
-      }}
-    />
-  );
+  const chipProps: any = {
+    label: showLabel ? displayLabel : undefined,
+    color: config.color,
+    size: size,
+    variant: variant,
+    sx: {
+      fontWeight: 600,
+      '& .MuiChip-icon': {
+        fontSize: size === 'small' ? '16px' : '20px',
+      },
+      '& .MuiChip-label': {
+        fontSize: size === 'small' ? '0.75rem' : '0.875rem',
+      },
+    },
+    ...rest,
+  };
+
+  if (showIcon && IconComponent) {
+    chipProps.icon = <IconComponent />;
+  }
+
+  return <Chip {...chipProps} />;
 };
 
 export default StatusBadge;

@@ -9,6 +9,7 @@ import {
   FormControl,
   Grid,
   Divider,
+  SelectChangeEvent,
 } from '@mui/material';
 import {
   LocationOn as LocationIcon,
@@ -26,7 +27,7 @@ interface OrderItemProps {
 // Status configuration removed - now using StatusBadge component
 
 export const OrderItem: React.FC<OrderItemProps> = ({ order, onStatusUpdate }) => {
-  const handleStatusChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleStatusChange = (event: SelectChangeEvent<string>) => {
     onStatusUpdate(order.id, event.target.value);
   };
 

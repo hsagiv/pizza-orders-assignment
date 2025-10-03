@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 export interface SettingsState {
   ordersPerPage: number;
+  showAll: boolean; // New field for show all mode
   sortBy: 'orderTime' | 'status' | 'title' | 'location';
   sortOrder: 'asc' | 'desc';
   autoRefresh: boolean;
@@ -10,11 +11,12 @@ export interface SettingsState {
   language: string;
   rtl: boolean;
   // Filter settings
-  statusFilter: 'all' | 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered';
+  statusFilter: 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered';
 }
 
 const initialState: SettingsState = {
   ordersPerPage: 2,
+  showAll: false, // Default to paginated view
   sortBy: 'orderTime',
   sortOrder: 'desc',
   autoRefresh: true,
@@ -22,7 +24,7 @@ const initialState: SettingsState = {
   theme: 'light',
   language: 'en',
   rtl: false,
-  statusFilter: 'all',
+  statusFilter: 'Received', // Default to showing only "Received" orders
 };
 
 export const settingsSlice = createSlice({
@@ -31,6 +33,13 @@ export const settingsSlice = createSlice({
   reducers: {
     setOrdersPerPage: (state, action: PayloadAction<number>) => {
       state.ordersPerPage = Math.max(1, Math.min(4, action.payload));
+    },
+    setShowAll: (state, action: PayloadAction<boolean>) => {
+      state.showAll = action.payload;
+      // When enabling showAll, disable pagination
+      if (action.payload) {
+        state.ordersPerPage = 1; // Reset to minimum when showing all
+      }
     },
     setSortBy: (state, action: PayloadAction<'orderTime' | 'status' | 'title'>) => {
       state.sortBy = action.payload;
@@ -53,7 +62,7 @@ export const settingsSlice = createSlice({
     setRtl: (state, action: PayloadAction<boolean>) => {
       state.rtl = action.payload;
     },
-    setStatusFilter: (state, action: PayloadAction<'all' | 'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered'>) => {
+    setStatusFilter: (state, action: PayloadAction<'Received' | 'Preparing' | 'Ready' | 'En-Route' | 'Delivered'>) => {
       state.statusFilter = action.payload;
     },
   },
@@ -61,6 +70,7 @@ export const settingsSlice = createSlice({
 
 export const {
   setOrdersPerPage,
+  setShowAll,
   setSortBy,
   setSortOrder,
   setAutoRefresh,

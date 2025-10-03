@@ -35,11 +35,12 @@ import { OrderItem } from './OrderItem';
 import { OrderMap } from './OrderMap';
 import { StatusBadge } from './StatusBadge';
 import { useWebSocket } from '../hooks/useWebSocket';
+import { setStatusFilter, setShowAll } from '../store/slices/settingsSlice';
 
 export const OrderList: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { orders, loading, error } = useSelector((state: RootState) => state.orders);
-  const { ordersPerPage, sortBy, sortOrder, statusFilter } = useSelector((state: RootState) => state.settings);
+  const { ordersPerPage, showAll, sortBy, sortOrder, statusFilter } = useSelector((state: RootState) => state.settings);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(undefined);
 
@@ -72,9 +73,7 @@ export const OrderList: React.FC = () => {
   // Filter and sort orders based on current settings - MUST be before any early returns
   const filteredAndSortedOrders = React.useMemo(() => {
     // First filter orders by status
-    const filtered = statusFilter === 'all' 
-      ? orders 
-      : orders.filter(order => order.status === statusFilter);
+    const filtered = orders.filter(order => order.status === statusFilter);
     
     // Then sort the filtered orders
     const sorted = [...filtered].sort((a, b) => {
@@ -159,6 +158,19 @@ export const OrderList: React.FC = () => {
     );
   }
 
+  if (filteredAndSortedOrders.length === 0) {
+    return (
+      <Paper sx={{ p: 3, textAlign: 'center' }}>
+        <Typography variant="h6" color="text.secondary">
+          No {statusFilter} orders found
+        </Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+          Try selecting a different status filter to see other orders.
+        </Typography>
+      </Paper>
+    );
+  }
+
   const handleOrderSelect = (order: Order) => {
     setSelectedOrderId(order.id);
   };
@@ -168,21 +180,28 @@ export const OrderList: React.FC = () => {
       <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Typography variant="h4" component="h1">
-            Orders ({orders.length})
+            {statusFilter} Orders ({filteredAndSortedOrders.length})
           </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <Box
-              sx={{
-                width: 8,
-                height: 8,
-                borderRadius: '50%',
-                backgroundColor: isConnected ? 'success.main' : 'error.main',
-              }}
-            />
-            <Typography variant="caption" color="text.secondary">
-              {isConnected ? 'Live' : 'Offline'}
-            </Typography>
-          </Box>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    backgroundColor: isConnected ? 'success.main' : 'error.main',
+                  }}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  {isConnected ? 'Live' : 'Offline'}
+                </Typography>
+                {showAll && (
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, ml: 1 }}>
+                    <Typography variant="caption" color="primary.main" fontWeight="bold">
+                      📋 ALL
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
         </Box>
         <Box sx={{ display: 'flex', gap: 2 }}>
           <FormControl size="small" sx={{ minWidth: 120 }}>
@@ -192,7 +211,6 @@ export const OrderList: React.FC = () => {
               label="Filter"
               onChange={(e) => dispatch({ type: 'settings/setStatusFilter', payload: e.target.value })}
             >
-              <MenuItem value="all">All Orders</MenuItem>
               <MenuItem value="Received">Received</MenuItem>
               <MenuItem value="Preparing">Preparing</MenuItem>
               <MenuItem value="Ready">Ready</MenuItem>
@@ -229,12 +247,24 @@ export const OrderList: React.FC = () => {
             <Select
               value={ordersPerPage}
               label="Per Page"
+              disabled={showAll}
               onChange={(e) => dispatch({ type: 'settings/setOrdersPerPage', payload: Number(e.target.value) })}
             >
               <MenuItem value={1}>1 Order</MenuItem>
               <MenuItem value={2}>2 Orders</MenuItem>
               <MenuItem value={3}>3 Orders</MenuItem>
               <MenuItem value={4}>4 Orders</MenuItem>
+            </Select>
+          </FormControl>
+          <FormControl size="small" sx={{ minWidth: 120 }}>
+            <InputLabel>Display</InputLabel>
+            <Select
+              value={showAll ? 'all' : 'paginated'}
+              label="Display"
+              onChange={(e) => dispatch(setShowAll(e.target.value === 'all'))}
+            >
+              <MenuItem value="paginated">Paginated</MenuItem>
+              <MenuItem value="all">Show All</MenuItem>
             </Select>
           </FormControl>
         </Box>
@@ -296,7 +326,7 @@ export const OrderList: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {filteredAndSortedOrders.slice(0, ordersPerPage).map((order) => (
+              {filteredAndSortedOrders.slice(0, showAll ? filteredAndSortedOrders.length : ordersPerPage).map((order) => (
                 <TableRow key={order.id} hover>
                   <TableCell component="th" scope="row">
                     {order.id.substring(0, 8)}...
@@ -364,10 +394,17 @@ export const OrderList: React.FC = () => {
         />
       )}
 
-      {filteredAndSortedOrders.length > ordersPerPage && (
+      {!showAll && filteredAndSortedOrders.length > ordersPerPage && (
         <Box sx={{ mt: 3, textAlign: 'center' }}>
           <Typography variant="body2" color="text.secondary">
             Showing {ordersPerPage} of {filteredAndSortedOrders.length} orders
+          </Typography>
+        </Box>
+      )}
+      {showAll && (
+        <Box sx={{ mt: 3, textAlign: 'center' }}>
+          <Typography variant="body2" color="text.secondary">
+            Showing all {filteredAndSortedOrders.length} orders
           </Typography>
         </Box>
       )}
