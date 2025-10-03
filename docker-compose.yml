@@ -78,7 +78,6 @@ services:
     ports:
       - "3001:3001"
     volumes:
-      - ./server:/app
       - /app/node_modules
     depends_on:
       database:
@@ -122,7 +121,6 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./client:/app
       - /app/node_modules
     depends_on:
       backend:
