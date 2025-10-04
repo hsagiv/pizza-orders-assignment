@@ -286,7 +286,7 @@ const defaultConfig: AppConfig = {
     },
     pagination: {
       defaultLimit: parseInt(process.env.API_PAGINATION_DEFAULT || '20', 10),
-      maxLimit: parseInt(process.env.API_PAGINATION_MAX || '100', 10),
+      maxLimit: parseInt(process.env.API_PAGINATION_MAX || '500', 10),
       defaultOffset: parseInt(process.env.API_PAGINATION_OFFSET || '0', 10),
     },
     response: {

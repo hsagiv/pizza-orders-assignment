@@ -63,7 +63,7 @@ BEGIN
             40.7 + (random() * 0.1),  -- Random latitude around NYC
             -74.0 - (random() * 0.1), -- Random longitude around NYC
             NOW() - (random() * interval '7 days'), -- Random time in last 7 days
-            statuses[1 + (random() * (array_length(statuses, 1) - 1))::int]
+            statuses[1 + (random() * (array_length(statuses, 1) - 1))::int]::order_status
         );
         
         -- Add 1-4 random subitems per order
@@ -79,11 +79,11 @@ BEGIN
                 END,
                 1 + (random() * 3)::int, -- Random amount 1-3
                 CASE (random() * 4)::int
-                    WHEN 0 THEN 'pizza'
-                    WHEN 1 THEN 'drink'
-                    WHEN 2 THEN 'salad'
-                    WHEN 3 THEN 'dessert'
-                    ELSE 'appetizer'
+                    WHEN 0 THEN 'pizza'::subitem_type
+                    WHEN 1 THEN 'drink'::subitem_type
+                    WHEN 2 THEN 'salad'::subitem_type
+                    WHEN 3 THEN 'dessert'::subitem_type
+                    ELSE 'appetizer'::subitem_type
                 END
             );
         END LOOP;

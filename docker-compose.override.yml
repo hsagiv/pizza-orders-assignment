@@ -22,6 +22,7 @@ services:
       DB_NAME: pizza_orders_dev
       LOG_LEVEL: debug
       JWT_SECRET: dev-secret-key
+      API_PAGINATION_MAX: 500
     volumes:
       - ./server:/app
       - /app/node_modules

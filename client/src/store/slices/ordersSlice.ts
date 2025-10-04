@@ -52,8 +52,9 @@ export const fetchOrders = createAsyncThunk(
   'orders/fetchOrders',
   async (_, { rejectWithValue }) => {
     try {
-      // Request all orders by setting a high limit
-      const response = await fetch('/api/orders?limit=1000');
+      // Use the configured API base URL
+      const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${apiBaseUrl}/orders?limit=500`);
       if (!response.ok) {
         throw new Error('Failed to fetch orders');
       }
@@ -72,7 +73,8 @@ export const updateOrderStatus = createAsyncThunk(
   'orders/updateOrderStatus',
   async ({ orderId, status }: { orderId: string; status: string }, { rejectWithValue }) => {
     try {
-      const response = await fetch(`/api/orders/${orderId}/status`, {
+      const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001/api';
+      const response = await fetch(`${apiBaseUrl}/orders/${orderId}/status`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
