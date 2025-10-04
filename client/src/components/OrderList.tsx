@@ -57,6 +57,8 @@ export const OrderList: React.FC = () => {
   const { t } = useLanguage();
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [selectedOrderId, setSelectedOrderId] = useState<string | undefined>(undefined);
+  const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
+  const [switchingToShowAll, setSwitchingToShowAll] = useState(false);
 
   // WebSocket connection for real-time updates
   const { isConnected, error: wsError, subscribeToOrderUpdates, unsubscribeFromOrderUpdates } = useWebSocket(
@@ -126,15 +128,34 @@ export const OrderList: React.FC = () => {
     return sorted;
   }, [orders, sortBy, sortOrder, statusFilter]);
 
-  const handleStatusUpdate = (orderId: string, newStatus: string) => {
-    dispatch(updateOrderStatus({ orderId, status: newStatus }));
+  const handleStatusUpdate = async (orderId: string, newStatus: string) => {
+    setUpdatingOrderId(orderId);
+    try {
+      await dispatch(updateOrderStatus({ orderId, status: newStatus }));
+    } finally {
+      setUpdatingOrderId(null);
+    }
+  };
+
+  const handleShowAllChange = (showAll: boolean) => {
+    if (showAll) {
+      setSwitchingToShowAll(true);
+      // Simulate a brief loading state
+      setTimeout(() => {
+        setSwitchingToShowAll(false);
+      }, 500);
+    }
+    dispatch(setShowAll(showAll));
   };
 
 
-  if (loading && orders.length === 0) {
+  if ((loading && orders.length === 0) || switchingToShowAll) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-        <CircularProgress />
+      <Box display="flex" flexDirection="column" justifyContent="center" alignItems="center" minHeight="200px">
+        <CircularProgress size={40} />
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+          {switchingToShowAll ? 'Loading all records...' : 'Loading orders...'}
+        </Typography>
       </Box>
     );
   }
@@ -264,7 +285,7 @@ export const OrderList: React.FC = () => {
             <Select
               value={showAll ? 'all' : 'paginated'}
               label={t('display')}
-              onChange={(e) => dispatch(setShowAll(e.target.value === 'all'))}
+              onChange={(e) => handleShowAllChange(e.target.value === 'all')}
             >
               <MenuItem value="paginated">{t('paginated')}</MenuItem>
               <MenuItem value="all">{t('showAll')}</MenuItem>
@@ -287,7 +308,29 @@ export const OrderList: React.FC = () => {
 
       {/* Conditional rendering based on view mode */}
       {viewMode === 'list' ? (
-        <TableContainer component={Paper} sx={{ mt: 2 }}>
+        <TableContainer component={Paper} sx={{ mt: 2, position: 'relative' }}>
+          {(loading || switchingToShowAll) && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1,
+              }}
+            >
+              <CircularProgress size={40} />
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                {switchingToShowAll ? 'Loading all records...' : 'Loading...'}
+              </Typography>
+            </Box>
+          )}
           <Table sx={{ minWidth: 650 }} aria-label="orders table">
             <TableHead>
               <TableRow>
@@ -375,6 +418,7 @@ export const OrderList: React.FC = () => {
                         value={order.status}
                         onChange={(e) => handleStatusUpdate(order.id, e.target.value)}
                         displayEmpty
+                        disabled={updatingOrderId === order.id}
                       >
                         <MenuItem value="Received">Received</MenuItem>
                         <MenuItem value="Preparing">Preparing</MenuItem>
@@ -382,6 +426,9 @@ export const OrderList: React.FC = () => {
                         <MenuItem value="En-Route">En-Route</MenuItem>
                         <MenuItem value="Delivered">Delivered</MenuItem>
                       </Select>
+                      {updatingOrderId === order.id && (
+                        <CircularProgress size={16} sx={{ ml: 1 }} />
+                      )}
                     </FormControl>
                   </TableCell>
                 </TableRow>
@@ -390,11 +437,35 @@ export const OrderList: React.FC = () => {
           </Table>
         </TableContainer>
       ) : (
-        <LazyMap
-          orders={filteredAndSortedOrders}
-          onOrderSelect={handleOrderSelect}
-          selectedOrderId={selectedOrderId}
-        />
+        <Box sx={{ position: 'relative', minHeight: '400px' }}>
+          {(loading || switchingToShowAll) && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1,
+              }}
+            >
+              <CircularProgress size={40} />
+              <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                {switchingToShowAll ? 'Loading all records...' : 'Loading map...'}
+              </Typography>
+            </Box>
+          )}
+          <LazyMap
+            orders={filteredAndSortedOrders}
+            onOrderSelect={handleOrderSelect}
+            selectedOrderId={selectedOrderId}
+          />
+        </Box>
       )}
 
       {!showAll && filteredAndSortedOrders.length > ordersPerPage && (

@@ -45,8 +45,8 @@ export class OrderController {
         includeSubItems: parsedIncludeSubItems,
       });
 
-      // Get total count for pagination (temporarily disabled)
-      const totalCount = { totalOrders: orders.length };
+      // Get total count for pagination
+      const totalCount = await OrderService.getOrderStatistics();
 
       // Prepare response
       const response = {

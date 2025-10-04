@@ -19,6 +19,7 @@ import {
   LightMode as LightModeIcon,
   Refresh as RefreshIcon,
 } from '@mui/icons-material';
+import { CircularProgress } from '@mui/material';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState, AppDispatch } from '../store/store';
 import { setTheme, setLanguage, setRtl, setAutoRefresh } from '../store/slices/settingsSlice';
@@ -31,6 +32,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 export const Header: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { theme, language, rtl, autoRefresh } = useSelector((state: RootState) => state.settings);
+  const { loading } = useSelector((state: RootState) => state.orders);
   const { t } = useLanguage();
   
   const [settingsAnchor, setSettingsAnchor] = useState<null | HTMLElement>(null);
@@ -72,6 +74,9 @@ export const Header: React.FC = () => {
           <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
             🍕 Sagiv & Tictuk Pizza
           </Typography>
+          {loading && (
+            <CircularProgress size={20} sx={{ ml: 1 }} />
+          )}
           <Chip 
             label={t('orderManagement')} 
             size="small" 
